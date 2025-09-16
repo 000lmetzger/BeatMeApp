@@ -21,6 +21,8 @@
 2. mkcert installieren:
    ```bash
    choco install mkcert
+   
+Hinweis: Geht auch mit einem anderen Paketmanager wie z.B. mit Scoop
 
 ## Schritt 2 - Lokale Zertifizierungsstelle (CA) einrichten
     choco install mkcert
