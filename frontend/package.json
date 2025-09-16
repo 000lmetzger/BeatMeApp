@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "certs:init:mac": "mkdir -p certs && mkcert -key-file certs/dev-key.pem -cert-file certs/dev-cert.pem 127.0.0.1 ::1 localhost $(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo 192.168.0.2)",
+    "certs:init:win": "mkdir certs 2>NUL & mkcert -key-file certs/dev-key.pem -cert-file certs/dev-cert.pem 127.0.0.1 ::1 localhost"
   },
   "dependencies": {
     "react": "^19.0.0",
