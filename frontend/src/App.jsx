@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import appLogo from '/favicon.svg'
 import PWABadge from './PWABadge.jsx'
 import './App.css'
+import InstallButton from "./InstallButton.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,13 +24,14 @@ function App() {
           count is {count}
         </button>
         <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+          Edit <code>src/App.jsx</code> and save
         </p>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
       <PWABadge />
+        <InstallButton />
     </>
   )
 }
