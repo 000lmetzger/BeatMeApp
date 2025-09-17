@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { API_URL } from '../config/config.js';
+import {Link} from "react-router-dom";
 
 function Login({ onLogin }) {
     const [email, setEmail] = useState('');
@@ -9,21 +11,23 @@ function Login({ onLogin }) {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://dein-backend.com/api/login', {
-                method: 'POST',
+            const response = await fetch(API_URL + "/loginUser", {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
             });
 
-            if (!response.ok) {
-                throw new Error('Email oder Passwort falsch, du Hure');
+            if (response.ok) {
+                const data = await response.json();
+                if (data === false){
+                    document.getElementById("message").innerText = "Email oder Passwort nicht gültig";
+                }
+                else{
+                    onLogin();
+                }
             }
-
-            const data = await response.json();
-            onLogin();
-
         } catch (err) {
             setError('Login fehlgeschlagen. Bitte prüfe deine Eingaben.');
         }
@@ -31,7 +35,8 @@ function Login({ onLogin }) {
 
     return (
         <div style={{ maxWidth: '300px', margin: '0 auto' }}>
-            <h1>Login</h1>
+            <h1 style={{ margin: '0', padding: '10vw' }}>Beat Me</h1>
+            <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Email:</label><br />
@@ -40,6 +45,7 @@ function Login({ onLogin }) {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        style={{ width: '80%'}}
                     />
                 </div>
                 <div style={{ marginTop: '10px' }}>
@@ -49,13 +55,21 @@ function Login({ onLogin }) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        style={{ width: '80%'}}
                     />
                 </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit" style={{ marginTop: '15px' }}>
-                    Einloggen
-                </button>
+                <div style={{ display:'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
+                    <Link to="/signup">
+                        <button type="button" style={{ marginTop: '15px' }}>
+                            Sign Up
+                        </button>
+                    </Link>
+                    <button type="submit" style={{marginTop: '15px', backgroundColor: 'blue', color: 'white'}}>
+                        Einloggen
+                    </button>
+                </div>
             </form>
+            <div id="message"></div>
         </div>
     );
 }
