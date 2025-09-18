@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import fs from 'node:fs'
 
+import path from "path"
+import tailwindcss from "@tailwindcss/vite"
+
+
 function readHttpsConfig() {
     try {
         const key = fs.readFileSync('./certs/dev-key.pem')
@@ -35,8 +39,14 @@ export default defineConfig({
                     { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }
                 ]
             }
-        })
+        }),
+        tailwindcss()
     ],
+    resolve: {
+        alias: {
+          "@": path.resolve(__dirname, "./src"),
+        },
+      },
 
     server: {
         host: true,           // im LAN erreichbar
