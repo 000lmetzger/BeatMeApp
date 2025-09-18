@@ -28,7 +28,7 @@ public class FirebaseConfig {
 
             System.out.println();
             log.info("\u001B[32m× × × × × × × × × × × × × × × × × × \u001B[0m");
-            log.info("\u001B[32m\u001B[1mErfolgreich mit Firebase verbunden.\u001B[0m");
+            log.info("\u001B[32m\u001B[1mSuccessfully conncted with firebase\u001B[0m");
             log.info("\u001B[32m× × × × × × × × × × × × × × × × × × \u001B[0m");
             System.out.println();
 
@@ -36,7 +36,7 @@ public class FirebaseConfig {
         } catch (Exception e) {
             System.out.println();
             log.info("\u001B[31m× × × × × × × × × × × × × × × × × × \u001B[0m");
-            log.info("\u001B[1;31mFehler: Firebase konnte NICHT verbunden werden!\u001B[0m");
+            log.info("\u001B[1;31mERROR: Could not connect with Firebase: \u001B[0m" + e.getMessage() );
             log.info("\u001B[31m× × × × × × × × × × × × × × × × × × \u001B[0m");
             System.out.println();
         }

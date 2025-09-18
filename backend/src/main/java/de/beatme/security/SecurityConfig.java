@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/groups").permitAll()
                         // alles andere nur mit Token
                         .anyRequest().authenticated()
                 )
