@@ -8,7 +8,9 @@ function headerBar( {username, profileImage} ){
             color: 'white',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            padding: '0px',
+            margin: '0px'
         }}>
             <div>{username}</div>
         </nav>

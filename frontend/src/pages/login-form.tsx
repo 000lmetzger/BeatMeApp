@@ -88,7 +88,7 @@ export function LoginForm({
                   {loading ? "Loading..." : "Login"}
                 </Button>
                 <Button variant="outline" className="w-full" type="button">
-                    asf
+                   Login
                 </Button>
               </div>
             </div>
