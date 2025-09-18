@@ -59,11 +59,6 @@ function Login({ onLogin }) {
                     />
                 </div>
                 <div style={{ display:'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-                    <Link to="/signup">
-                        <button type="button" style={{ marginTop: '15px' }}>
-                            Sign Up
-                        </button>
-                    </Link>
                     <button type="submit" style={{marginTop: '15px', backgroundColor: 'blue', color: 'white'}}>
                         Einloggen
                     </button>

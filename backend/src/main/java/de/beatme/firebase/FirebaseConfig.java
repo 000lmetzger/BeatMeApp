@@ -19,6 +19,7 @@ public class FirebaseConfig {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
+                    .setStorageBucket("beatme-1609.firebasestorage.app")
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {

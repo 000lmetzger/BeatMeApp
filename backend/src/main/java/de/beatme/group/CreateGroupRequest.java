@@ -10,7 +10,7 @@ import java.util.List;
 public class CreateGroupRequest {
     String inviteID;
     String groupName;
-    Image icon;
+    String profilePicture;
     List<User> userList;
     List<Challenge>  challengeList;
     Integer timer;

@@ -1,10 +1,13 @@
 package de.beatme.user;
 
+import de.beatme.logging.LogController;
 import lombok.extern.java.Log;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
+import java.util.Objects;
 
 @Log
 @RestController
@@ -17,14 +20,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public boolean createUser(@RequestBody CreateUserRequest userRequest) {
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<?> createUser(@RequestPart("user") CreateUserRequest userRequest,
+                                        @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) {
+
         try {
-            userService.createNewUser(userRequest);
+            if (profilePic != null && !profilePic.isEmpty()) {
+                String contentType = profilePic.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Please upload an image (jpg, png, ...)"));
+                }
+            }
+
+            CreateUserResponse response = userService.createNewUser(userRequest, profilePic);
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            log.warning("User could not be created - ERROR MESSAGE: " + e.getMessage());
-            return false;
+            LogController.logError("User could not be created - ERROR MESSAGE: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
-        return true;
     }
 }

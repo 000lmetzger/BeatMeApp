@@ -1,12 +1,13 @@
 package de.beatme.user;
 
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class CreateUserRequest {
+@AllArgsConstructor
+public class CreateUserResponse {
+    private String uid;
     private String username;
     private String email;
-    private String password;
     private String profilePicture;
 }
