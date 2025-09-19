@@ -4,9 +4,10 @@ import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import {useNavigate} from "react-router-dom";
 import DisplaySingleGroupInUserHome from "../components/DisplaySingleGroupInUserHome.jsx";
 import {API_URL} from "../config/config.js";
+import {useUser} from "../context/UserContext.jsx";
 
 function Home() {
-    const [username, setUsername] = useState("No username set");
+    const { user, setUser } = useUser();
     const [groups, setGroups] = useState([
         {
             name: "GroupName A",
@@ -45,12 +46,12 @@ function Home() {
         }
     ]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState({name:"Guest"});
 
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/create-group");
+        navigate("/add-group");
     }
 
     useEffect(() => {
@@ -60,6 +61,7 @@ function Home() {
                 if (!response.ok) throw new Error("Could not load groups");
                 const data = await response.json();
                 setGroups(data);
+                setUser({name: "Koray"});
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -74,7 +76,7 @@ function Home() {
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar username={username}>
+            <HeaderBar username={user.name}>
                 <h1 className="mt-0 mb-0">Hello world</h1>
             </HeaderBar>
             <PageBelowHeaderBar className="flex-1 overflow-y-auto">
@@ -88,7 +90,7 @@ function Home() {
 
                 </div>
                 <button
-                    style={{ backgroundColor: "#2bff00" }}
+                    style={{ backgroundColor: "green" }}
                     className="fixed bottom-5 right-5 text-white h-25 w-25 rounded-full shadow-lg flex items-center justify-center"
                     onClick={handleClick}
                 >

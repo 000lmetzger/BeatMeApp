@@ -1,4 +1,4 @@
-function HeaderBar({ username, profileImage }) {
+function HeaderBar({ user, profileImage }) {
     return (
         <nav
             className="sticky top-0 z-50 bg-[#006] text-white flex justify-center items-center shadow-md"
@@ -7,7 +7,8 @@ function HeaderBar({ username, profileImage }) {
                 fontSize: "200%",
             }}
         >
-            <div>{username}</div>
+            <div>{user?.name || "Guest"}
+            </div>
         </nav>
     );
 }

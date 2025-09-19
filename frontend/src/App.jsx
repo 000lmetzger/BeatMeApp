@@ -1,28 +1,25 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home.jsx";
-import { LoginForm } from "./pages/login-form";
+import routes from "./routes/routes.jsx";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState(true);
-
     return (
-        <Router>
-            <Routes>
-                <Route
-                    path="/home"
-                    element={loggedIn ? <Home /> : <Navigate to="/login" replace />}
-                />
-                <Route
-                    path="/login"
-                    element={!loggedIn ? <LoginForm /> : <Navigate to="/home" replace />}
-                />
-                <Route
-                    path="*"
-                    element={<Navigate to={loggedIn ? "/home" : "/login"} replace />}
-                />
-            </Routes>
-        </Router>
+        <UserProvider>
+            <Router>
+                <Routes>
+                    <Route path="/login" element={routes.find(r => r.path === "/login").element} />
+                    <Route path="/signup" element={routes.find(r => r.path === "/signup").element} />
+
+                    {routes
+                        .filter(r => r.path !== "/login" && r.path !== "/signup")
+                        .map(route => (
+                            <Route key={route.path} path={route.path} element={route.element} />
+                        ))}
+
+                    <Route path="*" element={<Navigate to="/login" replace />} />
+                </Routes>
+            </Router>
+        </UserProvider>
     );
 }
 
