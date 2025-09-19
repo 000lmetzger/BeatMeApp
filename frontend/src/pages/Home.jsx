@@ -3,6 +3,7 @@ import {useState} from "react";
 import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import {useNavigate} from "react-router-dom";
 import {timeUntilMidnight} from "../utils/utils.js";
+import DisplaySingleGroupInUserHome from "../components/DisplaySingleGroupInUserHome.jsx";
 
 function Home() {
     const [username, setUsername] = useState("No username set");
@@ -55,28 +56,26 @@ function Home() {
             <HeaderBar username={username}>
                 <h1 className="mt-0 mb-0">Hello world</h1>
             </HeaderBar>
-            <PageBelowHeaderBar>
-                <div className="flex flex-col w-full gap-3 p-3 overflow-y-auto flex-1">
+            <PageBelowHeaderBar className="flex-1 overflow-y-auto">
+                <div className="flex flex-col w-full gap-3 p-3">
                     {groups.map((group, index) => (
-                        <div key={index} className="p-2 w-full h-40 border">
-                            {group.name}
-                            <br />
-                            {group.challenge}
-                            <br />
-                            {group.description}
-                            <br />
-                            {timeUntilMidnight()}
-                        </div>
+                        <DisplaySingleGroupInUserHome
+                            key={index}
+                            group_information={group}
+                        />
                     ))}
+
                 </div>
-                <button style={{backgroundColor: "#2bff00"}}
-                        className="fixed bottom-5 right-5  text-white h-25 w-25 rounded-full shadow-lg font flex items-center justify-center"
-                        onClick={handleClick}>
+                <button
+                    style={{ backgroundColor: "#2bff00" }}
+                    className="fixed bottom-5 right-5 text-white h-25 w-25 rounded-full shadow-lg flex items-center justify-center"
+                    onClick={handleClick}
+                >
                     <span className="text-[3.5rem]">+</span>
                 </button>
             </PageBelowHeaderBar>
         </div>
-    );
+    )
 }
 
 export default Home;

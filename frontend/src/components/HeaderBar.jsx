@@ -1,20 +1,15 @@
-function headerBar( {username, profileImage} ){
+function HeaderBar({ username, profileImage }) {
     return (
-        <nav style={{
-            backgroundColor: '#006',
-            minWidth: '100vw',
-            minHeight: '12vh',
-            fontSize: '200%',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '0px',
-            margin: '0px'
-        }}>
+        <nav
+            className="sticky top-0 z-50 bg-[#006] text-white flex justify-center items-center shadow-md"
+            style={{
+                minHeight: "12vh",
+                fontSize: "200%",
+            }}
+        >
             <div>{username}</div>
         </nav>
     );
 }
 
-export default headerBar;
+export default HeaderBar;
