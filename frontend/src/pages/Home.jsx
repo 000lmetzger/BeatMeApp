@@ -1,9 +1,9 @@
 import HeaderBar from "../components/HeaderBar.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import {useNavigate} from "react-router-dom";
-import {timeUntilMidnight} from "../utils/utils.js";
 import DisplaySingleGroupInUserHome from "../components/DisplaySingleGroupInUserHome.jsx";
+import {API_URL} from "../config/config.js";
 
 function Home() {
     const [username, setUsername] = useState("No username set");
@@ -44,12 +44,33 @@ function Home() {
             description: "Photograph something tiny compared to something huge."
         }
     ]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const navigate = useNavigate();
 
     const handleClick = () => {
         navigate("/create-group");
     }
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const response = await fetch(API_URL + "/groups");
+                if (!response.ok) throw new Error("Could not load groups");
+                const data = await response.json();
+                setGroups(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGroups();
+    }, []);
+
+
 
     return (
         <div className="h-screen w-screen flex flex-col">
