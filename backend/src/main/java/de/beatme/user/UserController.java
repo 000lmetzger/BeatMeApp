@@ -33,6 +33,7 @@ public class UserController {
             }
 
             CreateUserResponse response = userService.createNewUser(userRequest, profilePic);
+            LogController.logSuccess("User successfully created");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

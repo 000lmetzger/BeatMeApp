@@ -30,6 +30,7 @@ public class GroupController {
             }
 
             CreateGroupResponse response = groupService.createNewGroup(groupRequest, groupPic);
+            LogController.logSuccess("Group successfully created");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
