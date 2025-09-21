@@ -1,5 +1,8 @@
 package de.beatme.group;
 
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,15 +21,18 @@ public class GroupService {
 
     public CreateGroupResponse createNewGroup(CreateGroupRequest createGroupRequest, MultipartFile groupPic) {
         try {
+            Firestore db = FirestoreClient.getFirestore();
+
             UserRecord groupOwner = FirebaseAuth.getInstance().getUser(createGroupRequest.getOwnerID());
+            String ownerUid = groupOwner.getUid();
 
-            List<User> members = new ArrayList<>(createGroupRequest.getUserList() != null ? createGroupRequest.getUserList() : new ArrayList<>());
-
-            boolean ownerAlreadyIncluded = members.stream()
-                    .anyMatch(u -> u.getUid().equals(groupOwner.getUid()));
-            if (!ownerAlreadyIncluded) {
-                members.add(new User(groupOwner.getUid(), groupOwner.getEmail(), groupOwner.getDisplayName(), groupOwner.getEmail()));
-            }
+            List<User> groupMembers = new ArrayList<>();
+            groupMembers.add(new User(
+                    ownerUid,
+                    groupOwner.getDisplayName(),
+                    groupOwner.getEmail(),
+                    null
+            ));
 
             String groupId = UUID.randomUUID().toString();
             String inviteId = generateInviteId();
@@ -41,27 +47,58 @@ public class GroupService {
                 }
             }
 
-            Firestore db = FirestoreClient.getFirestore();
             assert groupUrl != null;
             Map<String, Object> groupData = Map.of(
                     "groupId", groupId,
                     "inviteID", inviteId,
                     "groupName", createGroupRequest.getGroupName(),
-                    "ownerId", groupOwner.getUid(),
-                    "members", members,
+                    "ownerId", ownerUid,
+                    "groupPicture", groupUrl,
+                    "members", groupMembers,
                     "challengeList", Optional.ofNullable(createGroupRequest.getChallengeList()).orElse(List.of()),
-                    "timer", createGroupRequest.getTimer(),
-                    "groupPicture", groupUrl
+                    "timer", createGroupRequest.getTimer()
             );
 
             db.collection("groups").document(groupId).set(groupData).get();
 
-            return new CreateGroupResponse(groupId, inviteId, createGroupRequest.getGroupName(), members, groupUrl);
+            DocumentReference userRef = db.collection("users").document(ownerUid);
+            userRef.update("groups", FieldValue.arrayUnion(groupId));
+
+            return new CreateGroupResponse(
+                    groupId,
+                    inviteId,
+                    createGroupRequest.getGroupName(),
+                    groupMembers,
+                    groupUrl
+            );
 
         } catch (Exception e) {
             LogController.logError("Group could not be created: " + e.getMessage());
-            throw new RuntimeException("Error when creating group", e);
+            throw new RuntimeException("Failed to create group: ", e);
         }
+    }
+
+    public List<CreateGroupResponse> getGroupsOfUser(String uid) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        DocumentSnapshot userDoc = db.collection("users").document(uid).get().get();
+        if (!userDoc.exists()) {
+            throw new RuntimeException("User not found");
+        }
+
+        List<String> groupIds = (List<String>) userDoc.get("groups");
+        if (groupIds == null || groupIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<CreateGroupResponse> groups = new ArrayList<>();
+        for (String groupId : groupIds) {
+            DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+            if (groupDoc.exists()) {
+                groups.add(groupDoc.toObject(CreateGroupResponse.class));
+            }
+        }
+        return groups;
     }
 
     private String generateInviteId() {
@@ -74,7 +111,7 @@ public class GroupService {
         return sb.toString();
     }
 
-    public String uploadGroupPicture(String groupId, byte[] fileBytes) throws Exception {
+    public String uploadGroupPicture(String groupId, byte[] fileBytes) {
         Bucket bucket = StorageClient.getInstance().bucket();
 
         String fileName = "groups/" + groupId + "/group.jpg";

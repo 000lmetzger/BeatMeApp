@@ -37,4 +37,14 @@ public class GroupController {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/user/{uid}")
+    public ResponseEntity<?> getGroupsOfUser(@PathVariable String uid) {
+        try {
+            return ResponseEntity.ok(groupService.getGroupsOfUser(uid));
+        } catch (Exception e) {
+            LogController.logError("Could not fetch groups of user - ERROR: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
