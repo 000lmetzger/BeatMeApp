@@ -1,6 +1,6 @@
 function Voting(){
     return(
-        <div></div>
+        <div>Voting</div>
     )
 }
 

@@ -1,6 +1,6 @@
 function Ranking(){
     return(
-        <div></div>
+        <div>Ranking</div>
     )
 }
 
