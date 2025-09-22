@@ -1,5 +1,3 @@
-import {FaCamera, FaUpload} from "react-icons/fa";
-
 function Ranking( { group }){
     return (
         <div className="bg-gray-100 flex pb-[20%] flex-1 flex-col justify-between items-center p-5">

@@ -10,6 +10,10 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
         setIsModalOpen(true);
     };
 
+    const changeOrderOfImages = (v) => {
+        return v.sort((a, b) => b.points - a.points);
+    }
+
     const voted = (selected_user, points) => {
         let new_voting_obj = [];
         let adjust_user = {};
@@ -33,7 +37,7 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
         <div className="flex-1 overflow-y-auto min-h-0 w-full p-4 pb-20">
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 {voting && voting.length > 0 ? (
-                    voting.map((item, index) => (
+                    changeOrderOfImages(voting).map((item, index) => (
                         <div key={item.id ?? index} onClick={() => handleCardClick(item)}>
                             <VotingCard user={item}/>
                         </div>
@@ -58,14 +62,14 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
                             alt={selectedUser.name}
                             className="mt-4 rounded-lg w-full"
                         />
-                        <div className="mt-5 mb-2">Vote for this image:</div>
+                        <div className="mt-5 mb-2">{((selectedUser.points === 2)||(selectedUser.points === 3)) ? <p>You have already voted: {selectedUser.points} Points</p> : (selectedUser.points === 1) ? <p>Vote for this image: 1 Point </p> : (pointsGiven.length >= 3) ? <p>Voting completed</p> : <p>Vote for this image:</p>}</div>
                         <div className="flex flex-row justify-between">
                             <button
                                 style={{ backgroundColor: "gold" }}
                                 onClick={() => voted(selectedUser, 3)}
-                                disabled={pointsGiven.includes(3)}
+                                disabled={pointsGiven.includes(3) || (selectedUser.points !== 0)}
                                 className={`p-2 rounded text-white font-bold transition-opacity duration-200 ${
-                                    pointsGiven.includes(3) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
+                                    (pointsGiven.includes(3) || (selectedUser.points !== 0)) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
                                 }`}
                             >
                                 3<br />Points
@@ -74,9 +78,9 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
                             <button
                                 style={{ backgroundColor: "silver" }}
                                 onClick={() => voted(selectedUser, 2)}
-                                disabled={pointsGiven.includes(2)}
+                                disabled={pointsGiven.includes(2) || (selectedUser.points !== 0)}
                                 className={`p-2 rounded text-white font-bold transition-opacity duration-200 ${
-                                    pointsGiven.includes(2) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
+                                    (pointsGiven.includes(2) || (selectedUser.points !== 0)) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
                                 }`}
                             >
                                 2<br />Points
@@ -85,9 +89,9 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
                             <button
                                 style={{ backgroundColor: "#e8812c" }}
                                 onClick={() => voted(selectedUser, 1)}
-                                disabled={pointsGiven.includes(1)}
+                                disabled={pointsGiven.includes(1) || (selectedUser.points !== 0)}
                                 className={`p-2 rounded text-white font-bold transition-opacity duration-200 ${
-                                    pointsGiven.includes(1) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
+                                    (pointsGiven.includes(1) || (selectedUser.points !== 0)) ? "opacity-0 cursor-not-allowed" : "hover:opacity-90"
                                 }`}
                             >
                                 1<br />Point
