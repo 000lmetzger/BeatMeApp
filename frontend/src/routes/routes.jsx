@@ -12,7 +12,7 @@ const routes = [
     { path: "/home", element: <Home /> },
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <SignUp /> },
-    { path: "/ranking", element: <GroupTabs /> },
+    { path: "/group", element: <GroupTabs /> },
     { path: "/voting", element: <Voting /> },
     { path: "/add-group", element: <AddGroup /> },
     { path: "/create-group", element: <CreateGroup /> },
