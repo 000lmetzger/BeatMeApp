@@ -1,19 +1,25 @@
-import { useState } from 'react';
-import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import routes from "./routes/routes.jsx";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState(false);
-
     return (
-        <div style={{
-            backgroundImage: 'linear-gradient(to bottom, rgb(232, 249, 255), rgb(172, 255, 252))',
-            minHeight: '100vh',
-            minWidth: '100vw'
-        }}>
-            {!loggedIn && <Login onLogin={() => setLoggedIn(true)} />}
-            {loggedIn && <Home />}
-        </div>
+        <UserProvider>
+            <Router>
+                <Routes>
+                    <Route path="/login" element={routes.find(r => r.path === "/login").element} />
+                    <Route path="/signup" element={routes.find(r => r.path === "/signup").element} />
+
+                    {routes
+                        .filter(r => r.path !== "/login" && r.path !== "/signup")
+                        .map(route => (
+                            <Route key={route.path} path={route.path} element={route.element} />
+                        ))}
+
+                    <Route path="*" element={<Navigate to="/login" replace />} />
+                </Routes>
+            </Router>
+        </UserProvider>
     );
 }
 
