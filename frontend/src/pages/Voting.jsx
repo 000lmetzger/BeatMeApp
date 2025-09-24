@@ -1,7 +1,7 @@
 import VotingImagesOverview from "../components/VotingImagesOverview.jsx";
 import {useState} from "react";
 
-function Voting(){
+function Voting( {group} ){
     // voting-object wird per API-call angefragt und dann erstellt
     // Zum Testen wird es hier hart gecoded
     const [voting, setVoting] = useState([

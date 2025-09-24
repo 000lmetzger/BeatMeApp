@@ -7,47 +7,8 @@ import {API_URL} from "../config/config.js";
 import {useUser} from "../context/UserContext.jsx";
 
 function Home() {
-    const { user, setUser } = useUser();
-    const [groups, setGroups] = useState([
-        {
-            name: "GroupName A",
-            challenge: "Meme Recreation",
-            description: "Recreate a popular meme with yourself."
-        },
-        {
-            name: "GroupName B",
-            challenge: "Emoji Challenge",
-            description: "Recreate an emoji with facial expression or pose."
-        },
-        {
-            name: "GroupName C",
-            challenge: "Food Art",
-            description: "Create a funny or beautiful picture with food."
-        },
-        {
-            name: "GroupName D",
-            challenge: "Outfit Chaos",
-            description: "Wear the craziest combination of clothes you can find."
-        },
-        {
-            name: "GroupName E",
-            challenge: "Theme Photo",
-            description: "Take a photo based on a color theme, e.g., everything in red."
-        },
-        {
-            name: "GroupName F",
-            challenge: "Lookalike",
-            description: "Find something that looks like you."
-        },
-        {
-            name: "GroupName G",
-            challenge: "Mini vs. Maxi",
-            description: "Photograph something tiny compared to something huge."
-        }
-    ]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState({name:"Guest"});
-
+    const [groups, setGroups] = useState([]);
+    const { user } = useUser();
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -55,30 +16,26 @@ function Home() {
     }
 
     useEffect(() => {
+        if (!user?.uid) return;
+
         const fetchGroups = async () => {
             try {
-                const response = await fetch(API_URL + "/groups");
+                const response = await fetch(API_URL + `/groups/user/${user.uid}`);
                 if (!response.ok) throw new Error("Could not load groups");
                 const data = await response.json();
                 setGroups(data);
-                setUser({name: "Koray"});
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+            }
+            catch (err){
+                throw new Error(err);
             }
         };
 
         fetchGroups();
-    }, []);
-
-
+    }, [user?.uid]);
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar username={user.name}>
-                <h1 className="mt-0 mb-0">Hello world</h1>
-            </HeaderBar>
+            <HeaderBar username={user.username} profilePicture={user.profilePicture} />
             <PageBelowHeaderBar className="flex-1 overflow-y-auto">
                 <div className="flex flex-col w-full gap-3 p-3">
                     {groups.map((group, index) => (
@@ -87,7 +44,6 @@ function Home() {
                             group_information={group}
                         />
                     ))}
-
                 </div>
                 <button
                     style={{ backgroundColor: "green" }}

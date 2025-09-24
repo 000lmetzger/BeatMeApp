@@ -12,10 +12,11 @@ export default function GroupTabs() {
         setIndex(newValue);
     };
 
+    //todo: Add API-call to get group-details
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="flex flex-col flex-1 h-full min-h-0 overflow-auto">
-                <HeaderBarGroup groupName="Group A" groupId="40412" />
+                <HeaderBarGroup groupName={"Group"} groupId="40412" />
 
                 {index === 0 && (
                     <div className="flex flex-col flex-1 justify-between min-h-0">
