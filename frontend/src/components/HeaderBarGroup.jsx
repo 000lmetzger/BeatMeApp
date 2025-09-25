@@ -1,16 +1,11 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
+import BackwardsButton from "./BackwardsButton.jsx";
 
 export default function HeaderBarGroup({ groupName, groupId, groupImage, onBack }) {
     return (
         <header className="sticky top-0 h-20 z-50 p-5 bg-[#006] text-white flex flex-row justify-between items-center shadow-md">
-            <button
-                onClick={onBack}
-                className="p-2 rounded-full hover:bg-gray-100 transition"
-                aria-label="Zurück"
-            >
-                <ArrowLeft className="w-6 h-6 text-gray-700" />
-            </button>
+            <BackwardsButton onBack={onBack}></BackwardsButton>
 
             <div className="flex flex-col items-center text-center">
                 <span className="text-lg font-semibold ">{groupName}</span>

@@ -1,22 +1,38 @@
-function HeaderBar({ username, profilePicture }) {
+import BackwardsButton from "./BackwardsButton.jsx";
+import { useNavigate } from "react-router-dom";
+import {useUser} from "../context/UserContext.jsx";
+
+function HeaderBar() {
+    const navigate = useNavigate();
+    const { user } = useUser();
+
+    const onBack = () => {
+        navigate("/home");
+    };
+
     return (
         <nav
-            className="sticky top-0 z-50 bg-[#006] text-white flex items-center justify-between px-4 shadow-md"
-            style={{ minHeight: "12vh", fontSize: "200%" }}
+            className="sticky top-0 z-50 bg-gradient-to-r from-[#003366] to-[#0055aa] text-white flex items-center justify-between px-6 shadow-md"
+            style={{ minHeight: "12vh", fontSize: "1.6rem" }}
         >
-            <div className="w-1/3"></div>
+            <div className="flex items-center">
+                <BackwardsButton onBack={onBack} />
+            </div>
 
-            <div className="text-center w-1/3">
-                {username || "Guest"}
+            <div className="text-center flex-1 font-semibold tracking-wide">
+                {user.username || "Guest"}
             </div>
 
             <div className="w-1/3 flex justify-end">
-                {profilePicture && (
+                {user.profilePicture ? (
                     <img
-                        src={profilePicture}
-                        alt="Profile"
-                        className="h-15 w-15 rounded-full object-cover border-1 border-white"
+                        src={user.profilePicture}
+                        className="h-14 w-14 rounded-full object-cover border-2 border-white shadow-md"
                     />
+                ) : (
+                    <div className="h-14 w-14 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold border-2 border-white shadow-md">
+                        ?
+                    </div>
                 )}
             </div>
         </nav>

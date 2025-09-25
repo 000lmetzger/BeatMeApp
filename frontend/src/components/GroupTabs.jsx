@@ -1,22 +1,27 @@
 import React, { useState } from "react";
-
 import Voting from "../pages/Voting";
 import Challenge from "../pages/Challenge";
 import Ranking from "../pages/Ranking";
 import HeaderBarGroup from "./HeaderBarGroup.jsx";
+import {useNavigate} from "react-router-dom";
 
 export default function GroupTabs() {
     const [index, setIndex] = useState(1);
+    const navigate = useNavigate();
 
     const handleTabChange = (newValue) => {
         setIndex(newValue);
     };
 
+    const onBack = () =>{
+        navigate("/home");
+    }
+
     //todo: Add API-call to get group-details
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="flex flex-col flex-1 h-full min-h-0 overflow-auto">
-                <HeaderBarGroup groupName={"Group"} groupId="40412" />
+                <HeaderBarGroup groupName={"Group"} groupId="40412" onBack={onBack}/>
 
                 {index === 0 && (
                     <div className="flex flex-col flex-1 justify-between min-h-0">

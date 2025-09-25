@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 function CreateGroup() {
-    const { user } = useUser();
+    const { username, profilePicture } = useUser();
     const [groupName, setGroupName] = useState("");
     const [groupImage, setGroupImage] = useState(null);
 
@@ -20,9 +20,7 @@ function CreateGroup() {
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar user={user}>
-                <h1 className="mt-0 mb-0">Create Group</h1>
-            </HeaderBar>
+            <HeaderBar />
             <PageBelowHeaderBar className="flex-1 p-4">
                 <div className="flex flex-col gap-3 max-w-sm mx-auto p-10 text-[150%]">
                     <label htmlFor="group-name">Group Name</label>

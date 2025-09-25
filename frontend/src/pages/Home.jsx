@@ -21,7 +21,7 @@ function Home() {
         const fetchGroups = async () => {
             try {
                 const response = await fetch(API_URL + `/groups/user/${user.uid}`);
-                if (!response.ok) throw new Error("Could not load groups");
+                if (!response.ok) console.error("Could not load group_data")
                 const data = await response.json();
                 setGroups(data);
             }
@@ -35,7 +35,7 @@ function Home() {
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar username={user.username} profilePicture={user.profilePicture} />
+            <HeaderBar />
             <PageBelowHeaderBar className="flex-1 overflow-y-auto">
                 <div className="flex flex-col w-full gap-3 p-3">
                     {groups.map((group, index) => (

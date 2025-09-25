@@ -2,8 +2,8 @@ import { createContext, useContext, useState } from "react";
 
 const UserContext = createContext();
 
-export function UserProvider({ children, initialUser = { name: "Guest" } }) {
-    const [user, setUser] = useState(initialUser);
+export function UserProvider({ initialUser, children }) {
+    const [user, setUser] = useState(initialUser || { name: "Guest" });
 
     return (
         <UserContext.Provider value={{ user, setUser }}>
@@ -11,6 +11,7 @@ export function UserProvider({ children, initialUser = { name: "Guest" } }) {
         </UserContext.Provider>
     );
 }
+
 
 export const useUser = () => {
     const context = useContext(UserContext);
