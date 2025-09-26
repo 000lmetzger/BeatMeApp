@@ -5,6 +5,8 @@ import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.database.GenericTypeIndicator;
+import de.beatme.logging.LogController;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -27,17 +29,18 @@ public class ChallengeScheduler {
         List<QueryDocumentSnapshot> groups = db.collection("groups").get().get().getDocuments();
 
         for (DocumentSnapshot groupDoc : groups) {
-            List<String> completed = Optional.ofNullable(groupDoc.get("completedChallenges", List.class))
-                    .map(list -> (List<String>) list)
-                    .orElseGet(ArrayList::new);
+            List<String> completed = (List<String>) groupDoc.get("completedChallenges");
+            if (completed == null) {
+                completed = new ArrayList<>();
+            }
 
+            final List<String> completedFinal = completed; // für Lambda nötig
 
             String newChallengeId = allChallenges.stream()
                     .map(doc -> doc.getString("challengeId"))
-                    .filter(id -> !completed.contains(id))
+                    .filter(id -> !completedFinal.contains(id))
                     .findFirst()
                     .orElse(null);
-
 
             if (newChallengeId != null) {
                 db.collection("groups").document(groupDoc.getId())
@@ -46,6 +49,7 @@ public class ChallengeScheduler {
                                 "challengeAssignedAt", LocalDate.now().toString(),
                                 "completedChallenges", FieldValue.arrayUnion(newChallengeId)
                         ));
+                LogController.logSuccess(String.format("Assigned challenge %s", newChallengeId));
             }
         }
     }
