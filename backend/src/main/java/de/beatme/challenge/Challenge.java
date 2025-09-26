@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class Challenge {
     private String challengeId;
-    private String challengeName;
-    private String challengeDescription;
+    private String challenge;
+    private String description;
 }
 
