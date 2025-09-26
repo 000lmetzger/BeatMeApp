@@ -1,9 +1,6 @@
 package de.beatme.group;
 
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.FieldValue;
-import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.*;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
@@ -50,7 +47,7 @@ public class GroupService {
             assert groupUrl != null;
             Map<String, Object> groupData = Map.of(
                     "groupId", groupId,
-                    "inviteID", inviteId,
+                    "inviteId", inviteId,
                     "groupName", createGroupRequest.getGroupName(),
                     "ownerId", ownerUid,
                     "groupPicture", groupUrl,
@@ -122,5 +119,36 @@ public class GroupService {
                 + "/o/"
                 + fileName.replace("/", "%2F")
                 + "?alt=media";
+    }
+
+    public CreateGroupResponse joinGroup(String uid, String inviteId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        QuerySnapshot query = db.collection("groups")
+                .whereEqualTo("inviteId", inviteId)
+                .get().get();
+
+        if (query.isEmpty()) {
+            throw new RuntimeException("Group with inviteId not found");
+        }
+
+        DocumentSnapshot groupDoc = query.getDocuments().get(0);
+        String groupId = groupDoc.getId();
+
+        UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
+        User newMember = new User(
+                userRecord.getUid(),
+                userRecord.getDisplayName(),
+                userRecord.getEmail(),
+                null
+        );
+
+        DocumentReference groupRef = db.collection("groups").document(groupId);
+        groupRef.update("members", FieldValue.arrayUnion(newMember)).get();
+
+        DocumentReference userRef = db.collection("users").document(uid);
+        userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
+
+        return groupRef.get().get().toObject(CreateGroupResponse.class);
     }
 }

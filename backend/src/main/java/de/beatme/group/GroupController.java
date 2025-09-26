@@ -48,4 +48,15 @@ public class GroupController {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGroup(@RequestParam String uid, @RequestParam String inviteId) {
+        try {
+            CreateGroupResponse response = groupService.joinGroup(uid, inviteId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            LogController.logError("Could not join group - ERROR: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
