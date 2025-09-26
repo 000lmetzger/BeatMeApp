@@ -35,7 +35,7 @@ function Home() {
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar />
+            <HeaderBar enable_back={false}/>
             <PageBelowHeaderBar className="flex-1 overflow-y-auto">
                 <div className="flex flex-col w-full gap-3 p-3">
                     {groups.map((group, index) => (

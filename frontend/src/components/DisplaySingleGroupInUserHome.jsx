@@ -14,7 +14,14 @@ function DisplaySingleGroupInUserHome( {group_information} ){
             onClick={() => navigateIntoGroup(group_information.groupId)}
         >
             <div className="flex flex-row justify-between ">
-                <div className="text-[160%]">{group_information.groupName}</div>
+                <div className="flex items-center">
+                    <img
+                        src={group_information.groupPicture}
+                        alt="Gruppenbild"
+                        className="w-16 h-16 mr-2 rounded-md object-cover"
+                    />
+                    <div className="text-[160%]">{group_information.groupName}</div>
+                </div>
                 <div className="bg-black text-white p-1">{"Noch " + timeUntilMidnight()}</div>
             </div>
             <div className="text-[120%]">

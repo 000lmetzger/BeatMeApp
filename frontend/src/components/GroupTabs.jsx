@@ -17,7 +17,6 @@ export default function GroupTabs() {
         navigate("/home");
     }
 
-    //todo: Add API-call to get group-details
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden">
             <div className="flex flex-col flex-1 h-full min-h-0 overflow-auto">

@@ -20,7 +20,7 @@ function AddGroup() {
 
     return (
         <div className="h-screen w-screen flex flex-col">
-            <HeaderBar />
+            <HeaderBar enable_back={true}/>
             <PageBelowHeaderBar className="flex-1 p-4">
                 <div className="flex flex-col gap-3 max-w-sm mx-auto p-10 text-[150%]">
                     <label htmlFor="group-id">Enter Group-ID</label>
