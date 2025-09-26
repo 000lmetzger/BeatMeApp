@@ -78,6 +78,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/groups").permitAll()
                         .requestMatchers(HttpMethod.GET, "/groups/user/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/groups/join").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/challenges/group/**").permitAll()
+
                         // alles andere nur mit Token
                         .anyRequest().authenticated()
                 )

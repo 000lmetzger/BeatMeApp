@@ -23,43 +23,46 @@ public class GroupService {
             UserRecord groupOwner = FirebaseAuth.getInstance().getUser(createGroupRequest.getOwnerID());
             String ownerUid = groupOwner.getUid();
 
+            DocumentSnapshot userDoc = db.collection("users").document(ownerUid).get().get();
+            User ownerUser;
+            if (userDoc.exists()) {
+                ownerUser = userDoc.toObject(User.class);
+            } else {
+                ownerUser = new User(ownerUid,
+                        groupOwner.getDisplayName() != null ? groupOwner.getDisplayName() : "Unknown",
+                        groupOwner.getEmail(),
+                        groupOwner.getPhotoUrl() != null ? groupOwner.getPhotoUrl() : null);
+            }
+
             List<User> groupMembers = new ArrayList<>();
-            groupMembers.add(new User(
-                    ownerUid,
-                    groupOwner.getDisplayName(),
-                    groupOwner.getEmail(),
-                    null
-            ));
+            groupMembers.add(ownerUser);
 
             String groupId = UUID.randomUUID().toString();
             String inviteId = generateInviteId();
 
-            String groupUrl = null;
-            if (groupPic != null && !groupPic.isEmpty()) {
-                String contentType = groupPic.getContentType();
-                if (contentType != null && contentType.startsWith("image/")) {
-                    groupUrl = uploadGroupPicture(groupId, groupPic.getBytes());
-                } else {
-                    throw new IllegalArgumentException("Only images are supported (jpg, png, ...)");
-                }
+            if (groupPic == null || groupPic.isEmpty()) {
+                throw new IllegalArgumentException("Group picture is required!");
             }
+            String contentType = groupPic.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new IllegalArgumentException("Only images are supported (jpg, png, ...)");
+            }
+            String groupUrl = uploadGroupPicture(groupId, groupPic.getBytes());
 
-            assert groupUrl != null;
-            Map<String, Object> groupData = Map.of(
-                    "groupId", groupId,
-                    "inviteId", inviteId,
-                    "groupName", createGroupRequest.getGroupName(),
-                    "ownerId", ownerUid,
-                    "groupPicture", groupUrl,
-                    "members", groupMembers,
-                    "challengeList", Optional.ofNullable(createGroupRequest.getChallengeList()).orElse(List.of()),
-                    "timer", createGroupRequest.getTimer()
-            );
+            Map<String, Object> groupData = new HashMap<>();
+            groupData.put("groupId", groupId);
+            groupData.put("inviteId", inviteId);
+            groupData.put("groupName", createGroupRequest.getGroupName());
+            groupData.put("ownerId", ownerUid);
+            groupData.put("groupPicture", groupUrl);
+            groupData.put("members", groupMembers);
+            groupData.put("completedChallenges", new ArrayList<String>());
+            groupData.put("currentChallengeId", null);
 
             db.collection("groups").document(groupId).set(groupData).get();
 
             DocumentReference userRef = db.collection("users").document(ownerUid);
-            userRef.update("groups", FieldValue.arrayUnion(groupId));
+            userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
 
             return new CreateGroupResponse(
                     groupId,
@@ -132,15 +135,19 @@ public class GroupService {
             throw new RuntimeException("Group with inviteId not found");
         }
 
-        DocumentSnapshot groupDoc = query.getDocuments().get(0);
+        DocumentSnapshot groupDoc = query.getDocuments().getFirst();
         String groupId = groupDoc.getId();
 
-        UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
-        User newMember = new User(
-                userRecord.getUid(),
-                userRecord.getDisplayName(),
-                userRecord.getEmail(),
-                null
+        DocumentSnapshot userDoc = db.collection("users").document(uid).get().get();
+        if (!userDoc.exists()) {
+            throw new RuntimeException("User not found in Firestore");
+        }
+
+        Map<String, Object> newMember = Map.of(
+                "uid", Objects.requireNonNull(userDoc.getString("uid")),
+                "username", Objects.requireNonNull(userDoc.getString("username")),
+                "email", Objects.requireNonNull(userDoc.getString("email")),
+                "profilePicture", Objects.requireNonNull(userDoc.getString("profilePicture"))
         );
 
         DocumentReference groupRef = db.collection("groups").document(groupId);
@@ -149,6 +156,7 @@ public class GroupService {
         DocumentReference userRef = db.collection("users").document(uid);
         userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
 
-        return groupRef.get().get().toObject(CreateGroupResponse.class);
+        DocumentSnapshot updatedGroupDoc = groupRef.get().get();
+        return updatedGroupDoc.toObject(CreateGroupResponse.class);
     }
 }

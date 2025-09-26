@@ -55,8 +55,7 @@ class GroupControllerTest {
                       "ownerID": "%s",
                       "groupName": "BeatMe",
                       "userList": [],
-                      "challengeList": [],
-                      "timer": 60
+                      "challengeList": []
                     }
                     """.formatted(ownerUid);
 

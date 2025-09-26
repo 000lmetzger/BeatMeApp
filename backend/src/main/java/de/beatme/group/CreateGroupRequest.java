@@ -9,7 +9,6 @@ import java.util.List;
 public class CreateGroupRequest {
     private String groupName;
     private List<User> userList;
-    private Integer timer;
     private String ownerID;
-    private List<Challenge> challengeList;
 }
+

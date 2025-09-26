@@ -15,6 +15,6 @@ public class CreateGroupResponse {
     private String inviteId;
     private String groupName;
     private List<User> members;
-    private String groupUrl;
+    private String groupPicture;
 }
 
