@@ -9,8 +9,8 @@ function ProtectedLayout({ children, initialUser }) {
 const devUser = {
     email: "felix@example.com",
     groups: [
-        "e883b952-07f8-4759-ba7d-2e547f63bfe9",
-        "248618b0-79a5-4a2b-bbc6-bfe68121160d"
+        "0a427889-0127-4fe5-9e27-48d00ed12b20",
+        "92dd5d09-760e-4f96-a00e-0718bbd22523"
     ],
     profilePicture: "https://firebasestorage.googleapis.com/v0/b/beatme-1609.firebasestorage.app/o/users%2Fr0DqtbtzSLSJND0pyE2m5NpqtOy1%2Fprofile.jpg?alt=media",
     uid: "r0DqtbtzSLSJND0pyE2m5NpqtOy1",

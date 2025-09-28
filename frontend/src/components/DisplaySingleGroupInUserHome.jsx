@@ -1,16 +1,38 @@
 import {timeUntilMidnight} from "../utils/utils.js";
 import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {API_URL} from "../config/config.js";
 
 function DisplaySingleGroupInUserHome( {group_information} ){
+    const [challenge, setChallenge] = useState(null);
+
     const navigate = useNavigate();
 
     const navigateIntoGroup = (groupId) => {
         navigate(`/group/${groupId}`);
     }
 
+    useEffect(() => {
+        const fetchChallenge = async () => {
+            try {
+                const res = await fetch(API_URL + `/challenges/group/${group_information.groupId}/current`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setChallenge(data);
+                } else {
+                    setChallenge(null);
+                }
+            } catch (err) {
+                console.error(err);
+                setChallenge(null);
+            }
+        };
+        fetchChallenge();
+    }, [group_information.groupId]);
+
     return(
         <div
-            className="p-2 w-full h-40 border flex flex-col justify-between"
+            className="p-2 w-full h-45 border flex flex-col justify-between"
             onClick={() => navigateIntoGroup(group_information.groupId)}
         >
             <div className="flex flex-row justify-between ">
@@ -25,9 +47,9 @@ function DisplaySingleGroupInUserHome( {group_information} ){
                 <div className="bg-black text-white p-1">{"Noch " + timeUntilMidnight()}</div>
             </div>
             <div className="text-[120%]">
-                <b>{group_information.groupChallenge}</b>
+                <b>{challenge ? challenge.challenge : "No challenge found"}</b>
                 <br />
-                {group_information.groupDescription}
+                {challenge ? challenge.description : ""}
             </div>
         </div>
     )

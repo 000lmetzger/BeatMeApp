@@ -33,6 +33,8 @@ function Home() {
         fetchGroups();
     }, [user?.uid]);
 
+    console.log(groups)
+
     return (
         <div className="h-screen w-screen flex flex-col">
             <HeaderBar enable_back={false}/>
