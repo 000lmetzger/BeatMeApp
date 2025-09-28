@@ -8,6 +8,8 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.cloud.StorageClient;
 import de.beatme.logging.LogController;
 import de.beatme.user.User;
+import de.beatme.voting.ResultEntry;
+import de.beatme.voting.VoteRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,6 +60,7 @@ public class GroupService {
             groupData.put("members", groupMembers);
             groupData.put("completedChallenges", new ArrayList<String>());
             groupData.put("currentChallengeId", null);
+            groupData.put("votes", new HashMap<String, Object>());
 
             db.collection("groups").document(groupId).set(groupData).get();
 
@@ -158,5 +161,61 @@ public class GroupService {
 
         DocumentSnapshot updatedGroupDoc = groupRef.get().get();
         return updatedGroupDoc.toObject(CreateGroupResponse.class);
+    }
+
+    public void voteForChallenge(String groupId, String challengeId, String voterUid, VoteRequest vote) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        DocumentReference groupRef = db.collection("groups").document(groupId);
+        DocumentSnapshot groupDoc = groupRef.get().get();
+
+        if (!groupDoc.exists()) {
+            throw new RuntimeException("Group not found");
+        }
+
+        if (vote.getFirst() != null && vote.getFirst().equals(voterUid)) {
+            throw new RuntimeException("You cannot vote for yourself as first place!");
+        }
+
+        assert vote.getFirst() != null;
+        Map<String, Object> voteData = Map.of(
+                "first", vote.getFirst(),
+                "second", vote.getSecond(),
+                "third", vote.getThird()
+        );
+
+        groupRef.update("votes." + challengeId + "." + voterUid, voteData).get();
+    }
+
+    public List<ResultEntry> calculateResults(String groupId, String challengeId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+        if (!groupDoc.exists()) {
+            throw new RuntimeException("Group not found");
+        }
+
+        Object rawVotes = groupDoc.get("votes." + challengeId);
+        if (!(rawVotes instanceof Map)) {
+            return List.of();
+        }
+
+        Map<String, Map<String, String>> votes = (Map<String, Map<String, String>>) rawVotes;
+
+        if (votes.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Integer> scores = new HashMap<>();
+        for (Map<String, String> vote : votes.values()) {
+            if (vote.get("first") != null) scores.merge(vote.get("first"), 3, Integer::sum);
+            if (vote.get("second") != null) scores.merge(vote.get("second"), 2, Integer::sum);
+            if (vote.get("third") != null) scores.merge(vote.get("third"), 1, Integer::sum);
+        }
+
+        return scores.entrySet().stream()
+                .map(e -> new ResultEntry(e.getKey(), e.getValue()))
+                .sorted((a, b) -> Integer.compare(b.getPoints(), a.getPoints()))
+                .toList();
     }
 }

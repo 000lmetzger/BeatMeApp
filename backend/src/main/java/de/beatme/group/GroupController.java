@@ -1,10 +1,13 @@
 package de.beatme.group;
 
 import de.beatme.logging.LogController;
+import de.beatme.voting.ResultEntry;
+import de.beatme.voting.VoteRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -56,6 +59,31 @@ public class GroupController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             LogController.logError("Could not join group - ERROR: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{groupId}/challenges/{challengeId}/vote")
+    public ResponseEntity<?> vote(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            @RequestParam String uid,
+            @RequestBody VoteRequest voteRequest) {
+        try {
+            groupService.voteForChallenge(groupId, challengeId, uid, voteRequest);
+            return ResponseEntity.ok(Map.of("message", "Vote submitted"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{groupId}/challenges/{challengeId}/results")
+    public ResponseEntity<?> getResults(
+            @PathVariable String groupId,
+            @PathVariable String challengeId) {
+        try {
+            return ResponseEntity.ok(groupService.calculateResults(groupId, challengeId));
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
