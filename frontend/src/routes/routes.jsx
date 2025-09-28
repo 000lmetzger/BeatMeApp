@@ -1,5 +1,5 @@
-import Login from "../pages/Login";
-import SignUp from "../pages/SignUp";
+import {LoginForm} from "../pages/login-form";
+import {SignUpForm} from "../pages/SignUp-form";
 import Voting from "../pages/Voting";
 import AddGroup from "../pages/AddGroup";
 import CreateGroup from "../pages/CreateGroup";
@@ -9,8 +9,8 @@ import Home from "../pages/Home.jsx";
 
 const routes = [
     { path: "/home", element: <Home /> },
-    { path: "/login", element: <Login /> },
-    { path: "/signup", element: <SignUp /> },
+    { path: "/login", element: <LoginForm /> },
+    { path: "/signup", element: <SignUpForm /> },
     { path: `group/:groupId`, element: <GroupTabs /> },
     { path: "/voting", element: <Voting /> },
     { path: "/add-group", element: <AddGroup /> },

@@ -10,48 +10,69 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useNavigate } from 'react-router-dom';
 
-export function LoginForm({
+
+export function SignUpForm({
                               className,
                               ...props
                           }: React.ComponentProps<"div">) {
-    const navigate = useNavigate();
     const [email, setEmail] = useState("")
+    const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-
-    const handleSignUpClick =() => {
-        navigate('/signup');
-    };
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setLoading(true)
         setError(null)
 
+        const apiUrl = "http://localhost:8080/users";
+
+
+        const userRequest = {
+            username: username,
+            email: email,
+            password: password,
+        };
+
+        const formData = new FormData();
+        formData.append("user", JSON.stringify(userRequest));
+
+        formData.append("profilePic", new Blob([""], { type: 'application/octet-stream' }), 'placeholder.txt');
         try {
-            const res = await fetch("/loginUser", {
+            const res = await fetch(apiUrl, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            })
+                body: formData,
+            });
 
             if (!res.ok) {
-                throw new Error("Login failed")
-            }
+                        let errorMessage = `Registrierung fehlgeschlagen (Status: ${res.status})`;
+                        try {
+                            // Versuche, den Fehlerbody als JSON zu parsen
+                            const contentType = res.headers.get("content-type");
+                            if (contentType && contentType.includes("application/json")) {
+                                const errorData = await res.json();
+                                errorMessage = errorData.error || errorMessage;
+                            }
+                        } catch (e) {
+                            // Parsing fehlgeschlagen (Body war leer), ist ok.
+                        }
+                        throw new Error(errorMessage);
+                    }
 
-            const data = await res.json()
-            console.log("Login erfolgreich:", data)
+                    // ✅ Nur bei Erfolg JSON parsen
+                    const responseData = await res.json();
 
-            localStorage.setItem("token", data.token)
+                    console.log("Registrierung erfolgreich:", responseData);
+
+
         } catch (err: any) {
-            setError(err.message)
+            console.error("Registrierungsfehler:", err);
+            setError(err.message || "An unexpected error occurred.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-
     }
 
     return (
@@ -59,9 +80,9 @@ export function LoginForm({
             <h1>Beat Me</h1>
             <Card>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Sign Up</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Enter your email, User name and password to create an account
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -75,6 +96,17 @@ export function LoginForm({
                                     placeholder="m@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="grid gap-3">
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    id="username"
+                                    type="username"
+
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     required
                                 />
                             </div>
@@ -93,16 +125,9 @@ export function LoginForm({
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full" disabled={loading}>
-                                    {loading ? "Loading..." : "Login"}
+                                    {loading ? "Loading..." : "Sign Up"}
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full text-white"
-                                    type="button" // Wichtig: Damit das Formular NICHT beim Klick abgeschickt wird
-                                    onClick={handleSignUpClick} // Fügt die Navigation hinzu
-                                >
-                                    Create an Account
-                                </Button>
+
                             </div>
                         </div>
                     </form>

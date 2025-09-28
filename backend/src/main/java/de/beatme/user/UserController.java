@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // GEÄNDERT: Korrekte Konstante für multipart
     public ResponseEntity<?> createUser(@RequestPart("user") CreateUserRequest userRequest,
                                         @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) {
 
