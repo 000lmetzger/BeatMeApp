@@ -76,7 +76,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/groups").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/groups/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/groups/*/challenges/*/vote").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/groups/*/challenges/*/results").permitAll()
                         .requestMatchers(HttpMethod.GET, "/groups/user/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/groups/join").permitAll()
                         .requestMatchers(HttpMethod.GET, "/challenges/group/**").permitAll()
