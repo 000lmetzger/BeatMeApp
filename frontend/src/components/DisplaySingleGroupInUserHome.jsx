@@ -2,15 +2,18 @@ import {timeUntilMidnight} from "../utils/utils.js";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {API_URL} from "../config/config.js";
+import {useGroup} from "../context/GroupContext.jsx";
 
 function DisplaySingleGroupInUserHome( {group_information} ){
     const [challenge, setChallenge] = useState(null);
+    const { setGroup } = useGroup();
 
     const navigate = useNavigate();
 
-    const navigateIntoGroup = (groupId) => {
-        navigate(`/group/${groupId}`);
-    }
+    const navigateIntoGroup = (groupId, challenge) => {
+        setGroup(group_information);
+        navigate(`/group/${groupId}`, { state: { challenge } });
+    };
 
     useEffect(() => {
         const fetchChallenge = async () => {
@@ -33,7 +36,7 @@ function DisplaySingleGroupInUserHome( {group_information} ){
     return(
         <div
             className="p-2 w-full h-45 border flex flex-col justify-between"
-            onClick={() => navigateIntoGroup(group_information.groupId)}
+            onClick={() => navigateIntoGroup(group_information.groupId, challenge)}
         >
             <div className="flex flex-row justify-between ">
                 <div className="flex items-center">

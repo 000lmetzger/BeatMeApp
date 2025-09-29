@@ -1,10 +1,14 @@
 import { FaCamera, FaUpload } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import {API_URL} from "../config/config.js";
+import {useLocation, useNavigate} from "react-router-dom";
+import {useGroup} from "../context/GroupContext.jsx";
 
 function Challenge() {
-    const [challenge, setChallenge] = useState(null);
+    const { state } = useLocation();
+    const { group, setGroup } = useGroup();
     const [completed, setCompleted] = useState(false);
+    const [challenge, setChallenge] = useState(state ? { name: state.challenge } : null);
 
     useEffect(() => {
         const today = new Date().toISOString().split("T")[0];
@@ -13,7 +17,7 @@ function Challenge() {
         if (cached.date === today) {
             setChallenge(cached.data);
         } else {
-            fetch(API_URL + `/challenges/group/{groupId}/current`)
+            fetch(API_URL + `/challenges/group/${group_information.groupId}/current`)
                 .then(res => res.json())
                 .then(json => {
                     setChallenge(json);
@@ -33,6 +37,8 @@ function Challenge() {
             </div>
         );
     }
+
+    console.log(group);
 
     return (
         <div className="bg-gray-100 flex pb-[25%] flex-1 flex-col justify-between items-center p-4">
