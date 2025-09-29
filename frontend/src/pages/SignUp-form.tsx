@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,9 +17,11 @@ export function SignUpForm({
                               className,
                               ...props
                           }: React.ComponentProps<"div">) {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("")
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [profilePicture, setProfilePicture] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -26,6 +29,12 @@ export function SignUpForm({
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!profilePicture) {
+                    setError("A profile picture is required.");
+                    setLoading(false);
+                    return;
+        }
 
         const apiUrl = "http://localhost:8080/users";
 
@@ -36,16 +45,13 @@ export function SignUpForm({
         };
 
         try {
-            // 🖼️ Standardbild aus public/ laden
-            const imageResponse = await fetch("/felix2.png");
-            const imageBlob = await imageResponse.blob();
 
             const formData = new FormData();
             formData.append(
                 "user",
                 new Blob([JSON.stringify(userRequest)], { type: "application/json" })
             );
-            formData.append("profilePic", imageBlob, "felix2.png");
+            formData.append("profilePic", profilePicture, profilePicture.name);
 
             const res = await fetch(apiUrl, {
                 method: "POST",
@@ -66,6 +72,7 @@ export function SignUpForm({
 
             const responseData = await res.json();
             console.log("Registrierung erfolgreich:", responseData);
+            navigate('/login')
         } catch (err: any) {
             console.error("Registrierungsfehler:", err);
             setError(err.message || "An unexpected error occurred.");
@@ -120,6 +127,17 @@ export function SignUpForm({
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
+                            </div>
+                            <div className="grid gap-3">
+                                <Label htmlFor="profile-picture">Profile Picture</Label>
+                                    <Input
+                                        id="profile-picture"
+                                        type="file"
+                                        accept="image/*" // Akzeptiert nur Bilddateien
+                                        required // ZWINGEND ERFORDERLICH
+                                        onChange={(e) => setProfilePicture(e.target.files ? e.target.files[0] : null)}
+                                        />
+
                             </div>
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             <div className="flex flex-col gap-3">

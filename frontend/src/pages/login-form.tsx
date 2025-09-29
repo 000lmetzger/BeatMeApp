@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 import {
     Card,
     CardContent,
@@ -27,29 +29,39 @@ export function LoginForm({
     };
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
 
         try {
-            const res = await fetch("/loginUser", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            })
+          // Firebase Login
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
 
-            if (!res.ok) {
-                throw new Error("Login failed")
-            }
+          const user = userCredential.user;
 
-            const data = await res.json()
-            console.log("Login erfolgreich:", data)
+          // Firebase ID Token abrufen
+          const token = await user.getIdToken();
 
-            localStorage.setItem("token", data.token)
+          // Lokal speichern (z. B. für API Calls)
+          localStorage.setItem("firebaseToken", token);
+
+          console.log("Login erfolgreich:", user.email);
+
+          // Weiterleiten
+          navigate("/home");
         } catch (err: any) {
-            setError(err.message)
+          // Firebase-Fehler sauber anzeigen
+          const firebaseErrorMessage = err.code
+            ? `Login failed: ${err.code.split("/")[1]}`
+            : "An unexpected error occurred.";
+          console.error("Firebase Login Fehler:", err);
+          setError(firebaseErrorMessage);
         } finally {
-            setLoading(false)
+          setLoading(false);
         }
 
     }
