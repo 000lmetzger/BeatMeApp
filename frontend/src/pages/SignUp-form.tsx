@@ -23,50 +23,49 @@ export function SignUpForm({
     const [error, setError] = useState<string | null>(null)
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
 
         const apiUrl = "http://localhost:8080/users";
 
-
         const userRequest = {
-            username: username,
-            email: email,
-            password: password,
+            username,
+            email,
+            password,
         };
 
-        const formData = new FormData();
-        formData.append("user", JSON.stringify(userRequest));
-
-        formData.append("profilePic", new Blob([""], { type: 'application/octet-stream' }), 'placeholder.txt');
         try {
+            // 🖼️ Standardbild aus public/ laden
+            const imageResponse = await fetch("/felix2.png");
+            const imageBlob = await imageResponse.blob();
+
+            const formData = new FormData();
+            formData.append(
+                "user",
+                new Blob([JSON.stringify(userRequest)], { type: "application/json" })
+            );
+            formData.append("profilePic", imageBlob, "felix2.png");
+
             const res = await fetch(apiUrl, {
                 method: "POST",
                 body: formData,
             });
 
             if (!res.ok) {
-                        let errorMessage = `Registrierung fehlgeschlagen (Status: ${res.status})`;
-                        try {
-                            // Versuche, den Fehlerbody als JSON zu parsen
-                            const contentType = res.headers.get("content-type");
-                            if (contentType && contentType.includes("application/json")) {
-                                const errorData = await res.json();
-                                errorMessage = errorData.error || errorMessage;
-                            }
-                        } catch (e) {
-                            // Parsing fehlgeschlagen (Body war leer), ist ok.
-                        }
-                        throw new Error(errorMessage);
+                let errorMessage = `Registrierung fehlgeschlagen (Status: ${res.status})`;
+                try {
+                    const contentType = res.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const errorData = await res.json();
+                        errorMessage = errorData.error || errorMessage;
                     }
+                } catch (e) {}
+                throw new Error(errorMessage);
+            }
 
-                    // ✅ Nur bei Erfolg JSON parsen
-                    const responseData = await res.json();
-
-                    console.log("Registrierung erfolgreich:", responseData);
-
-
+            const responseData = await res.json();
+            console.log("Registrierung erfolgreich:", responseData);
         } catch (err: any) {
             console.error("Registrierungsfehler:", err);
             setError(err.message || "An unexpected error occurred.");
