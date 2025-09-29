@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import routes from "./routes/routes.jsx";
 import { UserProvider } from "./context/UserContext";
+import { GroupProvider } from "./context/GroupContext.jsx";
 
 function ProtectedLayout({ children, initialUser }) {
     return <UserProvider initialUser={initialUser}>{children}</UserProvider>;
@@ -31,9 +32,11 @@ function App() {
                             key={route.path}
                             path={route.path}
                             element={
-                                <ProtectedLayout initialUser={devUser}>
-                                    {route.element}
-                                </ProtectedLayout>
+                                <GroupProvider>
+                                    <ProtectedLayout initialUser={devUser}>
+                                        {route.element}
+                                    </ProtectedLayout>
+                                </GroupProvider>
                             }
                         />
                     ))}
