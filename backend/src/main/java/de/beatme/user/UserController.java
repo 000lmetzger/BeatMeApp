@@ -21,7 +21,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // GEÄNDERT: Korrekte Konstante für multipart
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createUser(@RequestPart("user") CreateUserRequest userRequest,
                                         @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) {
 
