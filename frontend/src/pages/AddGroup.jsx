@@ -3,15 +3,39 @@ import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import { useUser } from "../context/UserContext.jsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button"; // ShadCN Button import
+import { Button } from "@/components/ui/button";
+import {API_URL} from "../config/config.js"; // ShadCN Button import
 
 function AddGroup() {
     const { user } = useUser();
     const [groupId, setGroupId] = useState("");
     const navigate = useNavigate();
 
-    const handleJoin = () => {
-        console.log("Joining group with ID:", groupId);
+    const handleJoin = async () => {
+        try {
+            const url = new URL(`${API_URL}/groups/join`);
+            url.searchParams.append("uid", user.uid);
+            url.searchParams.append("inviteId", "#" + groupId);
+
+            const response = await fetch(url.toString(), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || "Could not join group");
+            }
+
+            const data = await response.json();
+            console.log("Successfully joined group:", data);
+            return data;
+        } catch (err) {
+            console.error("Error joining group:", err);
+            throw err;
+        }
     };
 
     const handleCreate = () => {
