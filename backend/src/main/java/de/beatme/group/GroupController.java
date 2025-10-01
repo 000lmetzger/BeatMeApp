@@ -63,19 +63,48 @@ public class GroupController {
         }
     }
 
-    @PostMapping("/{groupId}/challenges/{challengeId}/vote")
-    public ResponseEntity<?> vote(
+    @PostMapping("/{groupId}/challenges/{challengeId}/vote/first")
+    public ResponseEntity<?> voteFirst(
             @PathVariable String groupId,
             @PathVariable String challengeId,
             @RequestParam String uid,
-            @RequestBody VoteRequest voteRequest) {
+            @RequestParam String votedFor) {
         try {
-            groupService.voteForChallenge(groupId, challengeId, uid, voteRequest);
-            return ResponseEntity.ok(Map.of("message", "Vote submitted"));
+            groupService.voteSinglePlace(groupId, challengeId, uid, "first", votedFor);
+            return ResponseEntity.ok(Map.of("message", "First place vote submitted"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/{groupId}/challenges/{challengeId}/vote/second")
+    public ResponseEntity<?> voteSecond(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            @RequestParam String uid,
+            @RequestParam String votedFor) {
+        try {
+            groupService.voteSinglePlace(groupId, challengeId, uid, "second", votedFor);
+            return ResponseEntity.ok(Map.of("message", "Second place vote submitted"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{groupId}/challenges/{challengeId}/vote/third")
+    public ResponseEntity<?> voteThird(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            @RequestParam String uid,
+            @RequestParam String votedFor) {
+        try {
+            groupService.voteSinglePlace(groupId, challengeId, uid, "third", votedFor);
+            return ResponseEntity.ok(Map.of("message", "Third place vote submitted"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 
     @GetMapping("/{groupId}/challenges/{challengeId}/results")
     public ResponseEntity<?> getResults(

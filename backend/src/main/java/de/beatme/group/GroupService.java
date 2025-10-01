@@ -163,7 +163,7 @@ public class GroupService {
         return updatedGroupDoc.toObject(CreateGroupResponse.class);
     }
 
-    public void voteForChallenge(String groupId, String challengeId, String voterUid, VoteRequest vote) throws Exception {
+    public void voteSinglePlace(String groupId, String challengeId, String voterUid, String place, String votedFor) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
 
         DocumentReference groupRef = db.collection("groups").document(groupId);
@@ -173,18 +173,11 @@ public class GroupService {
             throw new RuntimeException("Group not found");
         }
 
-        if (vote.getFirst() != null && vote.getFirst().equals(voterUid)) {
-            throw new RuntimeException("You cannot vote for yourself as first place!");
+        if (votedFor.equals(voterUid)) {
+            throw new RuntimeException("You cannot vote for yourself!");
         }
 
-        assert vote.getFirst() != null;
-        Map<String, Object> voteData = Map.of(
-                "first", vote.getFirst(),
-                "second", vote.getSecond(),
-                "third", vote.getThird()
-        );
-
-        groupRef.update("votes." + challengeId + "." + voterUid, voteData).get();
+        groupRef.update("votes." + challengeId + "." + voterUid + "." + place, votedFor).get();
     }
 
     public List<ResultEntry> calculateResults(String groupId, String challengeId) throws Exception {
