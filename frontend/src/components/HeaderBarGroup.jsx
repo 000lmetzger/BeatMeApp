@@ -1,12 +1,9 @@
 import React from "react";
-import { ArrowLeft } from "lucide-react";
 import BackwardsButton from "./BackwardsButton.jsx";
 import {useGroup} from "../context/GroupContext.jsx";
 
 export default function HeaderBarGroup({ onBack }) {
     const { group } = useGroup();
-
-    console.log(group)
 
     return (
         <header className="sticky top-0 h-20 z-50 p-5 bg-[#006] text-white flex flex-row justify-between items-center shadow-md">

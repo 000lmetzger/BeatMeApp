@@ -3,16 +3,58 @@ import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import { useUser } from "../context/UserContext.jsx";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {useNavigate} from "react-router-dom";
+import {API_URL} from "../config/config.js";
 
 function CreateGroup() {
-    const { username, profilePicture } = useUser();
+    const { user } = useUser();
     const [groupName, setGroupName] = useState("");
     const [groupImage, setGroupImage] = useState(null);
+    const navigate = useNavigate();
 
-    const handleSubmit = () => {
-        // API-Call wird hier später eingefügt
-        console.log("Creating group:", groupName, groupImage);
+    const handleSubmit = async () => {
+        if (!groupName) {
+            alert("Please enter a group name");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+
+            const groupData = {
+                groupName,
+                ownerID: user.uid,
+                userList: [],
+            };
+            const groupBlob = new Blob([JSON.stringify(groupData)], {
+                type: "application/json",
+            });
+            formData.append("group", groupBlob, "group.json"); // <-- hier Filename hinzufügen
+
+            if (groupImage) {
+                formData.append("groupPic", groupImage);
+            }
+
+            const response = await fetch(`${API_URL}/groups`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                console.error("Could not create group:", errData.error || "Unknown error");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Group successfully created:", data);
+            navigate("/home");
+
+        } catch (err) {
+            console.error("Error creating group:", err);
+        }
     };
+
 
     const handleFileChange = (e) => {
         setGroupImage(e.target.files[0]);

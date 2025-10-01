@@ -1,69 +1,88 @@
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useNavigate } from 'react-router-dom';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext.jsx";
+import * as React from "react"
 
-export function LoginForm({
-                              className,
-                              ...props
-                          }: React.ComponentProps<"div">) {
+export function LoginForm({ className, ...props }) {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const { setUser } = useUser(); // UserContext
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const handleSignUpClick =() => {
-        navigate('/signup');
+    const handleSignUpClick = () => {
+        navigate("/signup");
     };
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e) {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
         try {
-          // Firebase Login
-          const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+            // Firebase Login
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const firebaseUser = userCredential.user;
 
-          const user = userCredential.user;
+            // Firebase ID Token abrufen
+            const token = await firebaseUser.getIdToken();
+            localStorage.setItem("firebaseToken", token);
 
-          // Firebase ID Token abrufen
-          const token = await user.getIdToken();
+            // Firestore: User-Daten laden (username, profilePicture, groups)
+            const db = getFirestore();
+            const userDocRef = doc(db, "users", firebaseUser.uid);
+            const userSnap = await getDoc(userDocRef);
 
-          // Lokal speichern (z. B. für API Calls)
-          localStorage.setItem("firebaseToken", token);
+            let username = null;
+            let profilePicture = null;
+            let groups = [];
 
-          console.log("Login erfolgreich:", user.email);
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                username = data.username || null;
+                profilePicture = data.profilePicture || null;
+                if (data.groups && Array.isArray(data.groups)) {
+                    groups = data.groups;
+                }
+            }
 
-          // Weiterleiten
-          navigate("/home");
-        } catch (err: any) {
-          // Firebase-Fehler sauber anzeigen
-          const firebaseErrorMessage = err.code
-            ? `Login failed: ${err.code.split("/")[1]}`
-            : "An unexpected error occurred.";
-          console.error("Firebase Login Fehler:", err);
-          setError(firebaseErrorMessage);
+            // User in Context setzen
+            setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                username,
+                profilePicture,
+                groups
+            });
+
+            console.log("Login erfolgreich:", firebaseUser.email);
+
+            // Weiterleiten
+            navigate("/home");
+        } catch (err) {
+            const firebaseErrorMessage = err.code
+                ? `Login failed: ${err.code.split("/")[1]}`
+                : "An unexpected error occurred.";
+            console.error("Firebase Login Fehler:", err);
+            setError(firebaseErrorMessage);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-
     }
 
     return (
@@ -110,8 +129,8 @@ export function LoginForm({
                                 <Button
                                     variant="outline"
                                     className="w-full text-white"
-                                    type="button" // Wichtig: Damit das Formular NICHT beim Klick abgeschickt wird
-                                    onClick={handleSignUpClick} // Fügt die Navigation hinzu
+                                    type="button"
+                                    onClick={handleSignUpClick}
                                 >
                                     Create an Account
                                 </Button>
@@ -121,5 +140,5 @@ export function LoginForm({
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 }

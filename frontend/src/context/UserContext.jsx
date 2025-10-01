@@ -1,22 +1,37 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const UserContext = createContext();
 
-export function UserProvider({ initialUser, children }) {
-    const [user, setUser] = useState(initialUser || { name: "Guest" });
+export const UserProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            if (firebaseUser) {
+                setUser({
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    // optional: username, profilePicture, groups aus Firestore/API laden
+                });
+            } else {
+                setUser(null);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <UserContext.Provider value={{ user, setUser }}>
             {children}
         </UserContext.Provider>
     );
-}
-
+};
 
 export const useUser = () => {
     const context = useContext(UserContext);
-    if (!context) {
-        throw new Error("useUser must be used within a UserProvider");
-    }
+    if (!context) throw new Error("useUser must be used within a UserProvider");
     return context;
 };
