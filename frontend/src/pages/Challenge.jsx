@@ -12,7 +12,9 @@ function Challenge() {
     useEffect(() => {
         fetch(`${API_URL}/challenges/group/${group.groupId}/current`)
             .then(res => res.json())
-            .then(json => { console.log("Response: ", json); setChallenge(json); })
+            .then(json => {
+                setChallenge(json);
+            })
             .catch(console.error); }, [group.groupId]);
             if (!challenge) {
                 return ( <div className="flex justify-center items-center p-6"> Lade Challenge... </div> );

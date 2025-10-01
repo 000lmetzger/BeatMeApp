@@ -8,13 +8,12 @@ function Ranking() {
     const { group } = useGroup();
     const [scores, setScores] = useState({});
 
-
     const memberIdToUsername = (mid) => {
         const members = group.members;
         for (let member of members){
-            if (member.uid === mid) return member.username;
+            if (member.uid === mid) return [member.username, member.profilePicture];
         }
-        return "No user";
+        return ["No user", ""];
     }
 
     useEffect(() => {
@@ -36,7 +35,7 @@ function Ranking() {
                 const data = await response.json();
                 setScores(data);
             } catch (err) {
-                console.error("Error fetching scores:");
+                console.error("Error fetching scores:", err);
             }
         };
 
@@ -44,26 +43,34 @@ function Ranking() {
     }, [group]);
 
     return (
-        <div className="bg-gray-100 flex pb-[20%] flex-1 flex-col justify-between items-center p-5">
-            <h1 className="font-bold p-5">Ranking</h1>
-            <div className="w-full h-full flex flex-col">
-                <div className="flex flex-row justify-between font-semibold border-b pb-2">
+        <div className="bg-gray-100 flex flex-col pb-[20%] flex-1 justify-start items-center p-5">
+            <h1 className="font-bold text-2xl mb-5">Ranking</h1>
+            <div className="w-full max-w-md flex flex-col bg-white rounded-lg shadow-md p-4">
+                <div className="flex flex-row justify-between font-semibold border-b pb-2 mb-2 text-gray-700">
                     <div>Name</div>
                     <div>Points</div>
                 </div>
-                <div className="flex flex-col justify-start mt-2">
+                <div className="flex flex-col space-y-2">
                     {Object.entries(scores)
                         .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
                         .map(([memberId, points]) => {
-                            const bgcolor = (memberId === user.uid) ? "bg-blue-200" : "";
+                            const bgcolor = (memberId === user.uid) ? "bg-blue-100" : "bg-white";
                             return (
                                 <div
-                                key={memberId}
-                                className={`p-3 flex flex-row justify-between border-b py-1 ${bgcolor}`}
+                                    key={memberId}
+                                    className={`flex flex-row items-center justify-between p-3 rounded-md shadow-sm hover:shadow-md transition ${bgcolor}`}
                                 >
-                                <div>{memberIdToUsername(memberId)}</div>
-                                <div>{points}</div>
-                            </div>);
+                                    <div className="flex items-center gap-3">
+                                        <img
+                                            src={memberIdToUsername(memberId)[1]}
+                                            alt="Profile"
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        <span className="font-medium">{memberIdToUsername(memberId)[0]}</span>
+                                    </div>
+                                    <div className="font-semibold text-gray-800">{points}</div>
+                                </div>
+                            );
                         })}
                 </div>
             </div>
