@@ -1,5 +1,8 @@
 package de.beatme.group;
 
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import de.beatme.logging.LogController;
 import de.beatme.voting.ResultEntry;
 import de.beatme.voting.VoteRequest;
@@ -106,14 +109,19 @@ public class GroupController {
     }
 
 
-    @GetMapping("/{groupId}/challenges/{challengeId}/results")
-    public ResponseEntity<?> getResults(
-            @PathVariable String groupId,
-            @PathVariable String challengeId) {
+    @GetMapping("/{groupId}/scores")
+    public ResponseEntity<?> getScores(@PathVariable String groupId) {
         try {
-            return ResponseEntity.ok(groupService.calculateResults(groupId, challengeId));
+            Firestore db = FirestoreClient.getFirestore();
+            DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+
+            if (!groupDoc.exists()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Group not found"));
+            }
+            Map<String, Long> scores = (Map<String, Long>) groupDoc.get("memberScores");
+            return ResponseEntity.ok(scores);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 }

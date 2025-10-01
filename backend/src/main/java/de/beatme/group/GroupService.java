@@ -66,6 +66,7 @@ public class GroupService {
             groupData.put("completedChallenges", new ArrayList<String>());
             groupData.put("currentChallengeId", null);
             groupData.put("votes", new HashMap<String, Object>());
+            groupData.put("memberScores", Map.of(ownerUid, 0));
 
             db.collection("groups").document(groupId).set(groupData).get();
 
@@ -159,7 +160,10 @@ public class GroupService {
         );
 
         DocumentReference groupRef = db.collection("groups").document(groupId);
+
         groupRef.update("members", FieldValue.arrayUnion(newMember)).get();
+
+        groupRef.update("memberScores." + uid, 0).get();
 
         DocumentReference userRef = db.collection("users").document(uid);
         userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
@@ -183,6 +187,16 @@ public class GroupService {
         }
 
         groupRef.update("votes." + challengeId + "." + voterUid + "." + place, votedFor).get();
+
+        int points;
+        switch (place) {
+            case "first" -> points = 3;
+            case "second" -> points = 2;
+            case "third" -> points = 1;
+            default -> throw new IllegalArgumentException("Invalid place: " + place);
+        }
+
+        groupRef.update("memberScores." + votedFor, FieldValue.increment(points)).get();
     }
 
     public List<ResultEntry> calculateResults(String groupId, String challengeId) throws Exception {
