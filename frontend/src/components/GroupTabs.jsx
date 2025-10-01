@@ -29,14 +29,12 @@ export default function GroupTabs() {
                 )}
                 {index === 1 && (
                     <div className="flex flex-col flex-1 justify-between min-h-0">
-                        <Challenge
-                            challenge={{header: "Meme-Challenge", description: "Hier steht die Beschreibung der Challenge."}}
-                        />
+                        <Challenge />
                     </div>
                 )}
                 {index === 2 && (
                     <div className="flex flex-col flex-1 justify-between min-h-0">
-                        <Ranking group={{ranking: [{name: "Felix", score: 24}, {name: "Koray", score: 13}, {name: "Prof Neemann", score: 12}, {name: "Felix", score: 3}]}}/>
+                        <Ranking />
                     </div>
                 )}
             </div>
