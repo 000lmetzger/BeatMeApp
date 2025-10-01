@@ -31,7 +31,7 @@ function AddGroup() {
 
             const data = await response.json();
             console.log("Successfully joined group:", data);
-            return data;
+            navigate("/home");
         } catch (err) {
             console.error("Error joining group:", err);
             throw err;
