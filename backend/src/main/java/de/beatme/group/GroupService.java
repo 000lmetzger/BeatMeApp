@@ -9,7 +9,6 @@ import com.google.firebase.cloud.StorageClient;
 import de.beatme.logging.LogController;
 import de.beatme.user.User;
 import de.beatme.voting.ResultEntry;
-import de.beatme.voting.VoteRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,16 +41,22 @@ public class GroupService {
             String groupId = UUID.randomUUID().toString();
             String inviteId = generateInviteId();
 
+            String groupUrl;
+
             if (groupPic == null || groupPic.isEmpty()) {
-                throw new IllegalArgumentException("Group picture is required!");
+                groupUrl = "https://firebasestorage.googleapis.com/v0/b/"
+                        + StorageClient.getInstance().bucket().getName()
+                        + "/o/groups%2Fdefault%2Fstandart-group-icon.png?alt=media";
+            } else {
+                String contentType = groupPic.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new IllegalArgumentException("Only images are supported (jpg, png, ...)");
+                }
+                groupUrl = uploadGroupPicture(groupId, groupPic.getBytes());
             }
-            String contentType = groupPic.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                throw new IllegalArgumentException("Only images are supported (jpg, png, ...)");
-            }
-            String groupUrl = uploadGroupPicture(groupId, groupPic.getBytes());
 
             Map<String, Object> groupData = new HashMap<>();
+
             groupData.put("groupId", groupId);
             groupData.put("inviteId", inviteId);
             groupData.put("groupName", createGroupRequest.getGroupName());
