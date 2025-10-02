@@ -26,3 +26,6 @@ dev-dist
 
 # ignore local TLS certs
 certs/
+
+#API Keys für Firebase
+src/config/firebase.js
