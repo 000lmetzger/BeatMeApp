@@ -124,4 +124,30 @@ public class GroupController {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/{groupId}/challenges/{challengeId}/submit")
+    public ResponseEntity<?> submitChallenge(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            @RequestParam String uid,
+            @RequestPart("file") MultipartFile file) {
+        try {
+            String submissionUrl = groupService.submitChallenge(groupId, challengeId, uid, file);
+            return ResponseEntity.ok(Map.of("message", "Submission uploaded", "url", submissionUrl));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{groupId}/challenges/{challengeId}/submissions")
+    public ResponseEntity<?> getSubmissions(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            @RequestParam String uid) {
+        try {
+            return ResponseEntity.ok(groupService.getSubmissions(groupId, challengeId, uid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }

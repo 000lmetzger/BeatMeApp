@@ -199,7 +199,36 @@ public class GroupService {
         groupRef.update("memberScores." + votedFor, FieldValue.increment(points)).get();
     }
 
-    public List<ResultEntry> calculateResults(String groupId, String challengeId) throws Exception {
+    public String submitChallenge(String groupId, String challengeId, String uid, MultipartFile file) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        Bucket bucket = StorageClient.getInstance().bucket();
+
+        String contentType = file.getContentType();
+        if (contentType == null || !(contentType.startsWith("image/") || contentType.startsWith("video/"))) {
+            throw new RuntimeException("Only images or videos are allowed");
+        }
+
+        String extension = Objects.requireNonNull(file.getOriginalFilename())
+                .substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+        String fileName = "groups/" + groupId + "/challenges/" + challengeId + "/" + uid + "." + extension;
+
+        bucket.create(fileName, file.getBytes(), contentType);
+
+        String fileUrl = "https://firebasestorage.googleapis.com/v0/b/"
+                + bucket.getName()
+                + "/o/"
+                + fileName.replace("/", "%2F")
+                + "?alt=media";
+
+        DocumentReference groupRef = db.collection("groups").document(groupId);
+        groupRef.update("submissions." + challengeId + "." + uid,
+                        Map.of("url", fileUrl, "type", contentType, "timestamp", new Date()))
+                .get();
+
+        return fileUrl;
+    }
+
+    public List<Map<String, Object>> getSubmissions(String groupId, String challengeId, String uid) throws Exception {
         Firestore db = FirestoreClient.getFirestore();
 
         DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
@@ -207,27 +236,28 @@ public class GroupService {
             throw new RuntimeException("Group not found");
         }
 
-        Object rawVotes = groupDoc.get("votes." + challengeId);
-        if (!(rawVotes instanceof Map)) {
+        Object raw = groupDoc.get("submissions." + challengeId);
+        if (!(raw instanceof Map<?, ?> submissionsMap)) {
             return List.of();
         }
 
-        Map<String, Map<String, String>> votes = (Map<String, Map<String, String>>) rawVotes;
+        List<Map<String, Object>> submissions = new ArrayList<>();
 
-        if (votes.isEmpty()) {
-            return List.of();
+        for (Map.Entry<?, ?> entry : submissionsMap.entrySet()) {
+            String userId = (String) entry.getKey();
+            if (userId.equals(uid)) continue;
+
+            Object submissionObj = entry.getValue();
+            if (submissionObj instanceof Map<?, ?> submissionData) {
+                Map<String, Object> submission = new HashMap<>();
+                submission.put("uid", userId);
+                submission.put("url", submissionData.get("url"));
+                submission.put("type", submissionData.get("type"));
+                submission.put("timestamp", submissionData.get("timestamp"));
+                submissions.add(submission);
+            }
         }
 
-        Map<String, Integer> scores = new HashMap<>();
-        for (Map<String, String> vote : votes.values()) {
-            if (vote.get("first") != null) scores.merge(vote.get("first"), 3, Integer::sum);
-            if (vote.get("second") != null) scores.merge(vote.get("second"), 2, Integer::sum);
-            if (vote.get("third") != null) scores.merge(vote.get("third"), 1, Integer::sum);
-        }
-
-        return scores.entrySet().stream()
-                .map(e -> new ResultEntry(e.getKey(), e.getValue()))
-                .sorted((a, b) -> Integer.compare(b.getPoints(), a.getPoints()))
-                .toList();
+        return submissions;
     }
 }
