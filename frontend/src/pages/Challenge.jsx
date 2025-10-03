@@ -1,43 +1,195 @@
-import { FaCamera, FaUpload } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import {API_URL} from "../config/config.js";
-import {useLocation, useNavigate} from "react-router-dom";
-import {useGroup} from "../context/GroupContext.jsx";
+import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useUser } from '../context/UserContext.jsx';
 
-function Challenge() {
-    const { state } = useLocation();
-    const { group, setGroup } = useGroup();
-    const [completed, setCompleted] = useState(false);
-    const [challenge, setChallenge] = useState(state ? { name: state.challenge } : null);
+const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+export function Challenge() {
+    const { user } = useUser();
+    const { groupId, challengeId } = useParams();
+
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [challenge, setChallenge] = useState(null);
+    const [dummyNotice, setDummyNotice] = useState(false);
+
+    const fileInputRef = useRef(null);
+    const cameraInputRef = useRef(null);
+
+    const apiUrlBase = "http://localhost:8080";
+
     useEffect(() => {
-        fetch(`${API_URL}/challenges/group/${group.groupId}/current`)
-            .then(res => res.json())
-            .then(json => {
-                setChallenge(json);
-            })
-            .catch(console.error); }, [group.groupId]);
-            if (!challenge) {
-                return ( <div className="flex justify-center items-center p-6"> Lade Challenge... </div> );
-            }
-            return (
-                <div className="bg-gray-100 flex pb-[25%] flex-1 flex-col justify-between items-center p-4">
-                    <h1 className="font-bold p-5">Challenge</h1>
-                    <h2 className="text-xl font-semibold mb-4">{challenge.challenge}</h2>
-                    <div className="bg-white shadow-md rounded-lg p-6 mb-6 w-full max-w-md">
-                        <p className="text-gray-700">{challenge.description}</p>
-                    </div> {
-                        !completed ? (
-                            <div className="flex flex-row justify-center items-center w-full space-x-4 border-1 h-[50%]">
-                                <button className="flex flex-col items-center w-[45%] h-[50%] py-3 px-4 rounded-lg transition" style={{ backgroundColor: "#11ff11" }} >
-                                    <FaCamera />
-                                    <br /> Take Photo/Video </button>
-                                <button className="flex flex-col items-center w-[45%] h-[50%] py-3 px-4 rounded-lg transition" style={{ backgroundColor: "#6666ff" }}
-                                        onClick={() => setCompleted(true)} >
-                                    <FaUpload />
-                                    <br /> Upload </button>
-                            </div>
-                                ) : (
-                            <div className="flex flex-row justify-center items-center w-full space-x-4 border-1 h-[50%]"> Challenge done </div> )} </div> );
+        async function fetchChallenge() {
+            try {
+                const res = await fetch(`${apiUrlBase}/challenges/group/${groupId}/current`);
+                if (!res.ok) {
+                    // Keine Challenge gefunden → Dummy nutzen
+                    setDummyNotice(true);
+                    setChallenge({
+                        challenge: "Dummy Challenge",
+                        description: "This is a placeholder challenge because no active challenge was found."
+                    });
+                    return;
                 }
+                const data = await res.json();
+                setChallenge(data);
+            } catch (err) {
+                setDummyNotice(true);
+                setChallenge({
+                    challenge: "Dummy Challenge",
+                    description: "This is a placeholder challenge because no active challenge was found."
+                });
+            }
+        }
+        fetchChallenge();
+    }, [groupId]);
+
+    const openCamera = () => { if (cameraInputRef.current) cameraInputRef.current.click(); };
+    const openFileBrowser = () => { if (fileInputRef.current) fileInputRef.current.click(); };
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files ? e.target.files[0] : null;
+        if (selectedFile) {
+            setFile(selectedFile);
+            handleUpload(selectedFile);
+        }
+    };
+
+    const handleUpload = async (fileToUpload) => {
+        setLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        const uid = user?.uid;
+
+        if (!uid || !fileToUpload) {
+            setError("Error: Please sign in and select a file.");
+            setLoading(false);
+            return;
+        }
+
+        const apiUrl = `${apiUrlBase}/groups/${groupId}/challenges/${challengeId}/submit`;
+
+        const formData = new FormData();
+        formData.append("file", fileToUpload);
+
+        try {
+            const res = await fetch(`${apiUrl}?uid=${uid}`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) {
+                let errorMessage = `Upload failed (Status: ${res.status})`;
+                try {
+                    const errorData = await res.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch (e) {}
+                throw new Error(errorMessage);
+            }
+
+            setSuccessMessage("Successfully submitted!");
+
+        } catch (err) {
+            console.error("Upload error:", err);
+            setError(err.message || "An unexpected upload error occurred.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const buttonStyle = {
+        padding: '10px 15px',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        backgroundColor: loading ? '#aaa' : '#007bff',
+        color: 'white',
+        flex: 1,
+        textAlign: 'center'
+    };
+
+    const outlineButtonStyle = {
+        ...buttonStyle,
+        backgroundColor: 'white',
+        border: '1px solid #007bff',
+        color: '#007bff',
+    };
+
+    return (
+        <div className={cn("flex flex-col gap-6 max-w-md mx-auto mt-12 px-4")}>
+
+            {/* Dummy Notice */}
+            {dummyNotice && <p style={{ color: 'orange', fontWeight: 'bold' }}>No challenge found, using dummy data.</p>}
+
+            {/* Challenge Title + Description */}
+            {challenge && (
+                <div>
+                    <h1 style={{ fontSize: '1.5em', fontWeight: 'bold' }}>
+                        {challenge.challenge}
+                    </h1>
+                    <p style={{ fontSize: '0.95em', color: '#555' }}>
+                        {challenge.description}
+                    </p>
+                </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {/* Buttons */}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                        onClick={openCamera}
+                        style={buttonStyle}
+                        disabled={loading}
+                    >
+                        📸 Open Camera
+                    </button>
+                    <button
+                        onClick={openFileBrowser}
+                        style={outlineButtonStyle}
+                        disabled={loading}
+                    >
+                        📂 Select from Storage
+                    </button>
+                </div>
+
+                {/* Status messages */}
+                {loading && <p style={{ color: 'blue' }}>Uploading...</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+
+                {/* File preview */}
+                {file && !loading && !successMessage && (
+                    <div style={{ marginTop: '10px', padding: '10px', border: '1px dashed #ccc', borderRadius: '4px' }}>
+                        <p>File ready: <strong>{file.name}</strong></p>
+                    </div>
+                )}
+
+                {/* Hidden inputs */}
+                <input
+                    ref={cameraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                />
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                />
+            </div>
+        </div>
+    );
+}
 
 export default Challenge;
+
+
+

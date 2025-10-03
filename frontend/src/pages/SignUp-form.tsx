@@ -133,8 +133,8 @@ export function SignUpForm({
                                     <Input
                                         id="profile-picture"
                                         type="file"
-                                        accept="image/*" // Akzeptiert nur Bilddateien
-                                        required // ZWINGEND ERFORDERLICH
+                                        accept="image/*"
+                                        required
                                         onChange={(e) => setProfilePicture(e.target.files ? e.target.files[0] : null)}
                                         />
 
