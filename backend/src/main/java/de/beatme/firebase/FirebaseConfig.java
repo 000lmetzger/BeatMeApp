@@ -10,11 +10,11 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Log
 public class FirebaseConfig {
 
-    public static final Firestore db = FirestoreClient.getFirestore();
+    public static Firestore db;
 
     @PostConstruct
     public void init() {
@@ -29,6 +29,8 @@ public class FirebaseConfig {
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
+
+            db = FirestoreClient.getFirestore();
 
             System.out.println();
             log.info("\u001B[32m× × × × × × × × × × × × × × × × × × \u001B[0m");

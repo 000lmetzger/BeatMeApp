@@ -44,28 +44,37 @@ public class SecurityConfig {
                                         FilterChain filterChain)
                 throws ServletException, IOException {
 
-            String header = request.getHeader("Authorization");
+            String path = request.getRequestURI();
 
-            if (header != null && header.startsWith("Bearer ")) {
-                String token = header.substring(7);
-                try {
-                    FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(token);
-
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    new User(decoded.getUid(), "", Collections.emptyList()),
-                                    null,
-                                    Collections.emptyList()
-                            );
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                } catch (FirebaseAuthException e) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
-                    return;
-                }
+            // Öffentliche Endpoints (z. B. /users) dürfen ohne Token durch
+            if (path.startsWith("/users")) {
+                filterChain.doFilter(request, response);
+                return;
             }
 
-            filterChain.doFilter(request, response);
+            String header = request.getHeader("Authorization");
+            if (header == null || !header.startsWith("Bearer ")) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing Authorization header");
+                return;
+            }
+
+            try {
+                String token = header.substring(7);
+                FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(token);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                new User(decoded.getUid(), "", Collections.emptyList()),
+                                null,
+                                Collections.emptyList()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                filterChain.doFilter(request, response);
+
+            } catch (FirebaseAuthException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
+            }
         }
     }
 
