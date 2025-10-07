@@ -24,15 +24,12 @@ public class GroupService {
             String ownerUid = groupOwner.getUid();
 
             DocumentSnapshot userDoc = FirebaseConfig.db.collection("users").document(ownerUid).get().get();
-            User ownerUser;
-            if (userDoc.exists()) {
-                ownerUser = userDoc.toObject(User.class);
-            } else {
-                ownerUser = new User(ownerUid,
-                        groupOwner.getDisplayName() != null ? groupOwner.getDisplayName() : "Unknown",
-                        groupOwner.getEmail(),
-                        groupOwner.getPhotoUrl() != null ? groupOwner.getPhotoUrl() : null);
-            }
+            User ownerUser = userDoc.exists()
+                    ? userDoc.toObject(User.class)
+                    : new User(ownerUid,
+                    Optional.ofNullable(groupOwner.getDisplayName()).orElse("Unknown"),
+                    groupOwner.getEmail(),
+                    groupOwner.getPhotoUrl() != null ? groupOwner.getPhotoUrl() : null);
 
             List<User> groupMembers = new ArrayList<>();
             groupMembers.add(ownerUser);
@@ -41,7 +38,6 @@ public class GroupService {
             String inviteId = generateInviteId();
 
             String groupUrl;
-
             if (groupPic == null || groupPic.isEmpty()) {
                 groupUrl = "https://firebasestorage.googleapis.com/v0/b/"
                         + StorageClient.getInstance().bucket().getName()
@@ -54,8 +50,18 @@ public class GroupService {
                 groupUrl = uploadGroupPicture(groupId, groupPic.getBytes());
             }
 
-            Map<String, Object> groupData = new HashMap<>();
+            List<QueryDocumentSnapshot> allChallenges =
+                    FirebaseConfig.db.collection("challenges").get().get().getDocuments();
 
+            String assignedChallengeId = null;
+            if (!allChallenges.isEmpty()) {
+                Random random = new Random();
+                assignedChallengeId = allChallenges
+                        .get(random.nextInt(allChallenges.size()))
+                        .getString("challengeId");
+            }
+
+            Map<String, Object> groupData = new HashMap<>();
             groupData.put("groupId", groupId);
             groupData.put("inviteId", inviteId);
             groupData.put("groupName", createGroupRequest.getGroupName());
@@ -63,7 +69,7 @@ public class GroupService {
             groupData.put("groupPicture", groupUrl);
             groupData.put("members", groupMembers);
             groupData.put("completedChallenges", new ArrayList<String>());
-            groupData.put("currentChallengeId", null);
+            groupData.put("currentChallengeId", assignedChallengeId); // ✅ direkt setzen
             groupData.put("votes", new HashMap<String, Object>());
             groupData.put("memberScores", Map.of(ownerUid, 0));
 
@@ -71,6 +77,8 @@ public class GroupService {
 
             DocumentReference userRef = FirebaseConfig.db.collection("users").document(ownerUid);
             userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
+
+            LogController.logSuccess("Assigned initial challenge " + assignedChallengeId + " to new group " + groupId);
 
             return new CreateGroupResponse(
                     groupId,
