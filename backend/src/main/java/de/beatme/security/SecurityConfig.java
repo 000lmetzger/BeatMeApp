@@ -46,7 +46,6 @@ public class SecurityConfig {
 
             String path = request.getRequestURI();
 
-            // Öffentliche Endpoints (z. B. /users) dürfen ohne Token durch
             if (path.startsWith("/users")) {
                 filterChain.doFilter(request, response);
                 return;
@@ -74,6 +73,7 @@ public class SecurityConfig {
 
             } catch (FirebaseAuthException e) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
+                return; // ← WICHTIG
             }
         }
     }
@@ -86,18 +86,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/groups/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/groups/*/challenges/*/vote").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/groups/*/challenges/*/results").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/groups/user/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/groups/join").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/groups/*/scores").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/groups/*/challenges/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/challenges/group/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/challenges/group/**/current/submitted").authenticated()
-
                         // alles andere nur mit Token
                         .anyRequest().authenticated()
+
                 )
                 //Firebase-Filter kommt vor Username/Password
                 .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class);
