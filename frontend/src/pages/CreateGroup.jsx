@@ -35,9 +35,15 @@ function CreateGroup() {
                 formData.append("groupPic", groupImage);
             }
 
+            const token = localStorage.getItem("firebaseToken");
+            const headers = {
+                "Authorization": `Bearer ${token}`
+            };
+
             const response = await fetch(`${API_URL}/groups`, {
                 method: "POST",
-                body: formData,
+                headers,
+                body: formData
             });
 
             if (!response.ok) {

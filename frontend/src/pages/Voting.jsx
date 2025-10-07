@@ -1,27 +1,105 @@
 import VotingImagesOverview from "../components/VotingImagesOverview.jsx";
-import {useState} from "react";
+import { useEffect, useState } from "react";
+import { API_URL } from "../config/config.js";
+import { useGroup } from "../context/GroupContext.jsx";
 
-function Voting( {group} ){
-    // voting-object wird per API-call angefragt und dann erstellt
-    // Zum Testen wird es hier hart gecoded
-    const [voting, setVoting] = useState([
-        {name: "Jan H.", image: "../../dev-assets/test_img_001.jpg", points: 0},
-        {name: "Koray", image: "../../dev-assets/test_img_002.jpg", points: 0},
-        {name: "Ruben", image: "../../dev-assets/test_img_007.jpg", points: 0},
-        {name: "Nils", image: "../../dev-assets/test_img_003.jpg", points: 0},
-        {name: "Lucas", image: "../../dev-assets/test_img_005.jpg", points: 0},
-        {name: "Felix", image: "../../dev-assets/test_img_006.jpg", points: 0}
-    ]);
+function Voting() {
+    const { group } = useGroup();
     const [pointsGiven, setPointsGiven] = useState([]);
+    const [voting, setVoting] = useState([]);
+    const [yesterdayChallengeId, setYesterdayChallengeId] = useState("");
 
+    const token = localStorage.getItem("firebaseToken");
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    };
+
+    useEffect(() => {
+        async function fetchCompletedChallenges() {
+            if (!group?.groupId) return;
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/challenges/group/${group.groupId}/completed`,
+                    { headers }
+                );
+                if (!response.ok) {
+                    console.error(`Fehler beim Laden der Challenges: ${response.status}`);
+                    return;
+                }
+
+                const data = await response.json();
+                setYesterdayChallengeId(data[0]?.challengeId ?? "");
+            } catch (error) {
+                console.error("Fehler beim Laden der Challenges:", error);
+            }
+        }
+
+        fetchCompletedChallenges();
+    }, [group?.groupId]);
+
+    useEffect(() => {
+        async function fetchSubmissions() {
+            if (!group?.groupId || !yesterdayChallengeId) return;
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/groups/${group.groupId}/challenges/${yesterdayChallengeId}/submissions`,
+                    { headers }
+                );
+
+                if (!response.ok) {
+                    console.error(`Fehler beim Laden der Submissions: ${response.status}`);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log("dat: \n");
+                console.log(data);
+                setVoting(data);
+            } catch (error) {
+                console.error("Fehler beim Laden der Submissions:", error);
+            }
+        }
+
+        fetchSubmissions();
+    }, [group?.groupId, yesterdayChallengeId]);
+
+    async function vote({ challengeId, userId, votedFor, position }) {
+        try {
+            const response = await fetch(
+                `${API_URL}/groups/${group.groupId}/challenges/${challengeId}/vote/${position}?uid=${userId}&votedFor=${votedFor}`,
+                { method: "POST", headers }
+            );
+
+            if (!response.ok) {
+                console.error("Vote fehlgeschlagen!");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("✅ Vote erfolgreich:", data);
+            return data;
+        } catch (err) {
+            console.error("Fehler beim Voten:", err);
+        }
+    }
+
+    // 4️⃣ Render
     return (
         <div className="bg-gray-100 flex flex-1 flex-col justify-between items-center">
             <h1 className="font-bold p-5">Voting</h1>
             <div className="w-full h-full flex flex-col">
-                <VotingImagesOverview voting={voting} setVoting={setVoting} pointsGiven={pointsGiven} setPointsGiven={setPointsGiven}/>
+                <VotingImagesOverview
+                    voting={voting}
+                    setVoting={setVoting}
+                    pointsGiven={pointsGiven}
+                    setPointsGiven={setPointsGiven}
+                />
             </div>
         </div>
-    )
+    );
 }
 
 export default Voting;

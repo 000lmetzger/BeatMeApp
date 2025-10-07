@@ -3,7 +3,7 @@ import Voting from "../pages/Voting";
 import Challenge from "../pages/Challenge";
 import Ranking from "../pages/Ranking";
 import HeaderBarGroup from "./HeaderBarGroup.jsx";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 export default function GroupTabs() {
     const [index, setIndex] = useState(1);

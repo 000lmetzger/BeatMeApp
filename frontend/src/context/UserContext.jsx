@@ -13,7 +13,6 @@ export const UserProvider = ({ children }) => {
                 setUser({
                     uid: firebaseUser.uid,
                     email: firebaseUser.email,
-                    // optional: username, profilePicture, groups aus Firestore/API laden
                 });
             } else {
                 setUser(null);

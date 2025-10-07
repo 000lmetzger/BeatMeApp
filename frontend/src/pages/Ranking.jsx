@@ -21,12 +21,12 @@ function Ranking() {
             if (!group?.groupId) return;
 
             try {
-                const response = await fetch(`${API_URL}/groups/${group.groupId}/scores`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+                const token = localStorage.getItem("firebaseToken");
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                };
+                const response = await fetch(`${API_URL}/groups/${group.groupId}/scores`, { headers });
 
                 if (!response.ok) {
                     console.error("Could not fetch scores");

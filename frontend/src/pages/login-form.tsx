@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext.jsx";
+import { useUser } from "@/context/UserContext";
 import * as React from "react"
 
 export function LoginForm({ className, ...props }) {

@@ -7,7 +7,7 @@ import { API_URL } from "../config/config.js";
 import { useUser } from "../context/UserContext.jsx";
 
 function Home() {
-    const { user } = useUser(); // Firebase-User aus Context
+    const { user } = useUser();
     const [groups, setGroups] = useState([]);
     const navigate = useNavigate();
 
@@ -16,11 +16,17 @@ function Home() {
     };
 
     useEffect(() => {
-        if (!user?.uid) return; // Lade erst, wenn User eingeloggt
+        if (!user?.uid) return;
 
         const fetchGroups = async () => {
             try {
-                const response = await fetch(`${API_URL}/groups/user/${user.uid}`);
+                const token = localStorage.getItem("firebaseToken");
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                };
+
+                const response = await fetch(`${API_URL}/groups/user`, { headers });
                 if (!response.ok) {
                     console.error("Could not load group_data");
                     return;
@@ -35,7 +41,6 @@ function Home() {
         fetchGroups();
     }, [user?.uid]);
 
-    // Optional: Fallback, wenn User noch nicht geladen
     if (!user) {
         return (
             <div className="flex justify-center items-center h-screen">

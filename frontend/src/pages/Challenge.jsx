@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../context/UserContext.jsx';
+import {API_URL} from "../config/config.js";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -18,18 +19,20 @@ export function Challenge() {
     const fileInputRef = useRef(null);
     const cameraInputRef = useRef(null);
 
-    const apiUrlBase = "http://localhost:8080";
-
     useEffect(() => {
         async function fetchChallenge() {
             try {
-                const res = await fetch(`${apiUrlBase}/challenges/group/${groupId}/current`);
+                const token = localStorage.getItem("firebaseToken");
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                };
+                const res = await fetch(`${API_URL}/challenges/group/${groupId}/current`, { headers });
                 if (!res.ok) {
-                    // Keine Challenge gefunden → Dummy nutzen
                     setDummyNotice(true);
                     setChallenge({
-                        challenge: "Dummy Challenge",
-                        description: "This is a placeholder challenge because no active challenge was found."
+                        challenge: "No Challenge found",
+                        description: ""
                     });
                     return;
                 }
@@ -70,15 +73,21 @@ export function Challenge() {
             return;
         }
 
-        const apiUrl = `${apiUrlBase}/groups/${groupId}/challenges/${challengeId}/submit`;
+        const apiUrl = `${API_URL}/groups/${groupId}/challenges/${challengeId}/submit`;
 
         const formData = new FormData();
         formData.append("file", fileToUpload);
 
         try {
+            const token = localStorage.getItem("firebaseToken");
+            const headers = {
+                "Authorization": `Bearer ${token}`
+            };
+
             const res = await fetch(`${apiUrl}?uid=${uid}`, {
                 method: "POST",
-                body: formData,
+                headers,       // JWT hier hinzufügen
+                body: formData
             });
 
             if (!res.ok) {
