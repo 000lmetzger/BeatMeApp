@@ -76,7 +76,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/users").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/groups/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/groups/*/challenges/*/vote").authenticated()
                         .requestMatchers(HttpMethod.GET, "/groups/*/challenges/*/results").authenticated()
