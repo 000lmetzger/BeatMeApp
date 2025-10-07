@@ -3,11 +3,11 @@ package de.beatme.user;
 import de.beatme.logging.LogController;
 import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Log
 @RestController
@@ -22,20 +22,19 @@ public class UserController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createUser(@RequestPart("user") CreateUserRequest userRequest,
-                                        @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) {
-
+                                        @RequestPart(value = "profilePic", required = false) MultipartFile profilePic,
+                                        Authentication authentication) {
         try {
+            String uid = authentication.getName();
             if (profilePic != null && !profilePic.isEmpty()) {
                 String contentType = profilePic.getContentType();
                 if (contentType == null || !contentType.startsWith("image/")) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Please upload an image (jpg, png, ...)"));
                 }
             }
-
-            CreateUserResponse response = userService.createNewUser(userRequest, profilePic);
+            CreateUserResponse response = userService.createNewUser(uid, userRequest, profilePic);
             LogController.logSuccess("User successfully created");
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             LogController.logError("User could not be created - ERROR MESSAGE: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
