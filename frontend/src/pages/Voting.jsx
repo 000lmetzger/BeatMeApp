@@ -7,7 +7,7 @@ function Voting() {
     const { group } = useGroup();
     const [pointsGiven, setPointsGiven] = useState([]);
     const [voting, setVoting] = useState([]);
-    const [yesterdayChallengeId, setYesterdayChallengeId] = useState("");
+    const [previousVoting, setPreviousVoting] = useState([]);
 
     const token = localStorage.getItem("firebaseToken");
     const headers = {
@@ -16,55 +16,29 @@ function Voting() {
     };
 
     useEffect(() => {
-        async function fetchCompletedChallenges() {
+        async function fetchPreviousSubmissions() {
             if (!group?.groupId) return;
 
             try {
                 const response = await fetch(
-                    `${API_URL}/challenges/group/${group.groupId}/completed`,
+                    `${API_URL}/groups/${group.groupId}/challenges/previous/submissions`,
                     { headers }
                 );
+
                 if (!response.ok) {
-                    console.error(`Fehler beim Laden der Challenges: ${response.status}`);
+                    console.error(`Fehler beim Laden der vorherigen Submissions: ${response.status}`);
                     return;
                 }
 
                 const data = await response.json();
-                setYesterdayChallengeId(data[0]?.challengeId ?? "");
+                setPreviousVoting(data);
+                console.log("Vorherige Challenge Submissions:", data);
             } catch (error) {
-                console.error("Fehler beim Laden der Challenges:", error);
+                console.error("Fehler beim Laden der vorherigen Submissions:", error);
             }
         }
-
-        fetchCompletedChallenges();
+        fetchPreviousSubmissions();
     }, [group?.groupId]);
-
-    useEffect(() => {
-        async function fetchSubmissions() {
-            if (!group?.groupId || !yesterdayChallengeId) return;
-
-            try {
-                const response = await fetch(
-                    `${API_URL}/groups/${group.groupId}/challenges/${yesterdayChallengeId}/submissions`,
-                    { headers }
-                );
-
-                if (!response.ok) {
-                    console.error(`Fehler beim Laden der Submissions: ${response.status}`);
-                    return;
-                }
-
-                const data = await response.json();
-                console.log("dat: \n");
-                console.log(data);
-                setVoting(data);
-            } catch (error) {
-                console.error("Fehler beim Laden der Submissions:", error);
-            }
-        }
-
-        fetchSubmissions();
-    }, [group?.groupId, yesterdayChallengeId]);
 
     async function vote({ challengeId, userId, votedFor, position }) {
         try {
@@ -86,7 +60,6 @@ function Voting() {
         }
     }
 
-    // 4️⃣ Render
     return (
         <div className="bg-gray-100 flex flex-1 flex-col justify-between items-center">
             <h1 className="font-bold p-5">Voting</h1>

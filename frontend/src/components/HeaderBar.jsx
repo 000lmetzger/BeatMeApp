@@ -1,8 +1,8 @@
 import BackwardsButton from "./BackwardsButton.jsx";
 import { useNavigate } from "react-router-dom";
-import {useUser} from "../context/UserContext.jsx";
+import { useUser } from "../context/UserContext.jsx";
 
-function HeaderBar( {enable_back} ) {
+function HeaderBar({ enable_back }) {
     const navigate = useNavigate();
     const { user } = useUser();
 
@@ -16,12 +16,8 @@ function HeaderBar( {enable_back} ) {
             style={{ minHeight: "12vh", fontSize: "1.6rem" }}
         >
             <div className="flex items-center">
-                <BackwardsButton
-                    onBack={onBack}
-                    className={enable_back ? "" : "invisible"}
-                />
+                {enable_back && <BackwardsButton onBack={onBack} />}
             </div>
-
 
             <div className="text-center flex-1 font-semibold tracking-wide">
                 {user.username || "Guest"}
