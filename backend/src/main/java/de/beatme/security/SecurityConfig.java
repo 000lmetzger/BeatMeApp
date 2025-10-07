@@ -87,7 +87,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         // alles andere nur mit Token
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
 
                 )
                 //Firebase-Filter kommt vor Username/Password
