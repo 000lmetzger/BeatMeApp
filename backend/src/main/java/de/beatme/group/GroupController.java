@@ -3,6 +3,7 @@ package de.beatme.group;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
+import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import de.beatme.voting.ResultEntry;
 import de.beatme.voting.VoteRequest;
@@ -105,8 +106,7 @@ public class GroupController {
     @GetMapping("/{groupId}/scores")
     public ResponseEntity<?> getScores(@PathVariable String groupId) {
         try {
-            Firestore db = FirestoreClient.getFirestore();
-            DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+            DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
             if (!groupDoc.exists()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Group not found"));
             }
@@ -129,12 +129,11 @@ public class GroupController {
         }
     }
 
-    @GetMapping("/{groupId}/challenges/{challengeId}/submissions")
-    public ResponseEntity<?> getSubmissions(@PathVariable String groupId, @PathVariable String challengeId,
-                                            Authentication authentication) {
+    @GetMapping("/{groupId}/challenges/previous/submissions")
+    public ResponseEntity<?> getPreviousSubmissions(@PathVariable String groupId, Authentication authentication) {
         try {
             String uid = authentication.getName();
-            return ResponseEntity.ok(groupService.getSubmissions(groupId, challengeId, uid));
+            return ResponseEntity.ok(groupService.getSubmissionsOfPreviousChallenge(groupId, uid));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

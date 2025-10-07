@@ -3,6 +3,7 @@ package de.beatme.challenge;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
+import de.beatme.firebase.FirebaseConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,9 +15,7 @@ public class ChallengeService {
 
 
     public Challenge getCurrentChallengeOfGroup(String groupId) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
         }
@@ -26,7 +25,7 @@ public class ChallengeService {
             throw new RuntimeException("No challenge assigned yet");
         }
 
-        DocumentSnapshot challengeDoc = db.collection("challenges").document(currentChallengeId).get().get();
+        DocumentSnapshot challengeDoc = FirebaseConfig.db.collection("challenges").document(currentChallengeId).get().get();
         if (!challengeDoc.exists()) {
             throw new RuntimeException("Challenge not found");
         }
@@ -35,9 +34,8 @@ public class ChallengeService {
     }
 
     public List<Challenge> getCompletedChallengesOfGroup(String groupId) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
 
-        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
         }
@@ -49,7 +47,7 @@ public class ChallengeService {
 
         List<Challenge> challenges = new ArrayList<>();
         for (String id : challengeIds) {
-            DocumentSnapshot challengeDoc = db.collection("challenges").document(id).get().get();
+            DocumentSnapshot challengeDoc = FirebaseConfig.db.collection("challenges").document(id).get().get();
             if (challengeDoc.exists()) {
                 challenges.add(challengeDoc.toObject(Challenge.class));
             }
@@ -58,9 +56,7 @@ public class ChallengeService {
     }
 
     public boolean hasUserSubmittedCurrentChallenge(String groupId, String uid) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
         }

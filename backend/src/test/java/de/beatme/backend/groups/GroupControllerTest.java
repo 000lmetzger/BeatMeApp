@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.FirestoreClient;
 import com.jayway.jsonpath.JsonPath;
+import de.beatme.firebase.FirebaseConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,8 +39,7 @@ class GroupControllerTest {
         String ownerUid = testUser.getUid();
 
         // 2. User auch in Firestore anlegen
-        Firestore db = FirestoreClient.getFirestore();
-        db.collection("users").document(ownerUid).set(Map.of(
+        FirebaseConfig.db.collection("users").document(ownerUid).set(Map.of(
                 "uid", ownerUid,
                 "email", email,
                 "username", "TestUser",
@@ -90,9 +90,9 @@ class GroupControllerTest {
             // 8. Cleanup
             FirebaseAuth.getInstance().deleteUser(ownerUid);
             if (groupId != null) {
-                db.collection("groups").document(groupId).delete().get();
+                FirebaseConfig.db.collection("groups").document(groupId).delete().get();
             }
-            db.collection("users").document(ownerUid).delete().get();
+            FirebaseConfig.db.collection("users").document(ownerUid).delete().get();
         }
     }
 }

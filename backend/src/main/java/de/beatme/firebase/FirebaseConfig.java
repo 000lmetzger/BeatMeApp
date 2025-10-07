@@ -1,8 +1,10 @@
 package de.beatme.firebase;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 @Log
 public class FirebaseConfig {
+
+    public static final Firestore db = FirestoreClient.getFirestore();
 
     @PostConstruct
     public void init() {

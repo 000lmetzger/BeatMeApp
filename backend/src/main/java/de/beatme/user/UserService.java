@@ -6,6 +6,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.StorageClient;
+import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -31,7 +32,6 @@ public class UserService {
                 }
             }
 
-            Firestore db = FirestoreClient.getFirestore();
             Map<String, Object> user = Map.of(
                     "uid", uid,
                     "username", request.getUsername(),
@@ -39,7 +39,7 @@ public class UserService {
                     "profilePicture", profileUrl
             );
 
-            db.collection("users").document(uid).set(user).get();
+            FirebaseConfig.db.collection("users").document(uid).set(user).get();
 
             LogController.logSuccess("User successfully created - uid: " + uid + ", username: " + request.getUsername() + ", email: " + request.getEmail());
             return new CreateUserResponse(uid, request.getUsername(), request.getEmail(), profileUrl);

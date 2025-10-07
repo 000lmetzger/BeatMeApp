@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.cloud.StorageClient;
+import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import de.beatme.user.User;
 import de.beatme.voting.ResultEntry;
@@ -19,12 +20,10 @@ public class GroupService {
 
     public CreateGroupResponse createNewGroup(CreateGroupRequest createGroupRequest, MultipartFile groupPic) {
         try {
-            Firestore db = FirestoreClient.getFirestore();
-
             UserRecord groupOwner = FirebaseAuth.getInstance().getUser(createGroupRequest.getOwnerID());
             String ownerUid = groupOwner.getUid();
 
-            DocumentSnapshot userDoc = db.collection("users").document(ownerUid).get().get();
+            DocumentSnapshot userDoc = FirebaseConfig.db.collection("users").document(ownerUid).get().get();
             User ownerUser;
             if (userDoc.exists()) {
                 ownerUser = userDoc.toObject(User.class);
@@ -68,9 +67,9 @@ public class GroupService {
             groupData.put("votes", new HashMap<String, Object>());
             groupData.put("memberScores", Map.of(ownerUid, 0));
 
-            db.collection("groups").document(groupId).set(groupData).get();
+            FirebaseConfig.db.collection("groups").document(groupId).set(groupData).get();
 
-            DocumentReference userRef = db.collection("users").document(ownerUid);
+            DocumentReference userRef = FirebaseConfig.db.collection("users").document(ownerUid);
             userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
 
             return new CreateGroupResponse(
@@ -88,9 +87,7 @@ public class GroupService {
     }
 
     public List<CreateGroupResponse> getGroupsOfUser(String uid) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        DocumentSnapshot userDoc = db.collection("users").document(uid).get().get();
+        DocumentSnapshot userDoc = FirebaseConfig.db.collection("users").document(uid).get().get();
         if (!userDoc.exists()) {
             throw new RuntimeException("User not found");
         }
@@ -102,7 +99,7 @@ public class GroupService {
 
         List<CreateGroupResponse> groups = new ArrayList<>();
         for (String groupId : groupIds) {
-            DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+            DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
             if (groupDoc.exists()) {
                 groups.add(groupDoc.toObject(CreateGroupResponse.class));
             }
@@ -134,9 +131,7 @@ public class GroupService {
     }
 
     public CreateGroupResponse joinGroup(String uid, String inviteId) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        QuerySnapshot query = db.collection("groups")
+        QuerySnapshot query = FirebaseConfig.db.collection("groups")
                 .whereEqualTo("inviteId", inviteId)
                 .get().get();
 
@@ -147,7 +142,7 @@ public class GroupService {
         DocumentSnapshot groupDoc = query.getDocuments().getFirst();
         String groupId = groupDoc.getId();
 
-        DocumentSnapshot userDoc = db.collection("users").document(uid).get().get();
+        DocumentSnapshot userDoc = FirebaseConfig.db.collection("users").document(uid).get().get();
         if (!userDoc.exists()) {
             throw new RuntimeException("User not found in Firestore");
         }
@@ -159,13 +154,13 @@ public class GroupService {
                 "profilePicture", Objects.requireNonNull(userDoc.getString("profilePicture"))
         );
 
-        DocumentReference groupRef = db.collection("groups").document(groupId);
+        DocumentReference groupRef = FirebaseConfig.db.collection("groups").document(groupId);
 
         groupRef.update("members", FieldValue.arrayUnion(newMember)).get();
 
         groupRef.update("memberScores." + uid, 0).get();
 
-        DocumentReference userRef = db.collection("users").document(uid);
+        DocumentReference userRef = FirebaseConfig.db.collection("users").document(uid);
         userRef.update("groups", FieldValue.arrayUnion(groupId)).get();
 
         DocumentSnapshot updatedGroupDoc = groupRef.get().get();
@@ -173,9 +168,7 @@ public class GroupService {
     }
 
     public void voteSinglePlace(String groupId, String challengeId, String voterUid, String place, String votedFor) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        DocumentReference groupRef = db.collection("groups").document(groupId);
+        DocumentReference groupRef = FirebaseConfig.db.collection("groups").document(groupId);
         DocumentSnapshot groupDoc = groupRef.get().get();
 
         if (!groupDoc.exists()) {
@@ -200,7 +193,6 @@ public class GroupService {
     }
 
     public String submitChallenge(String groupId, String challengeId, String uid, MultipartFile file) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
         Bucket bucket = StorageClient.getInstance().bucket();
 
         String contentType = file.getContentType();
@@ -220,7 +212,7 @@ public class GroupService {
                 + fileName.replace("/", "%2F")
                 + "?alt=media";
 
-        DocumentReference groupRef = db.collection("groups").document(groupId);
+        DocumentReference groupRef = FirebaseConfig.db.collection("groups").document(groupId);
         groupRef.update("submissions." + challengeId + "." + uid,
                         Map.of("url", fileUrl, "type", contentType, "timestamp", new Date()))
                 .get();
@@ -228,15 +220,20 @@ public class GroupService {
         return fileUrl;
     }
 
-    public List<Map<String, Object>> getSubmissions(String groupId, String challengeId, String uid) throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
-
-        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+    public List<Map<String, Object>> getSubmissionsOfPreviousChallenge(String groupId, String uid) throws Exception {
+        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
         }
 
-        Object raw = groupDoc.get("submissions." + challengeId);
+        List<String> completedChallenges = (List<String>) groupDoc.get("completedChallenges");
+        if (completedChallenges == null || completedChallenges.size() < 2) {
+            throw new RuntimeException("No previous challenge available");
+        }
+
+        String previousChallengeId = completedChallenges.get(completedChallenges.size() - 2);
+
+        Object raw = groupDoc.get("submissions." + previousChallengeId);
         if (!(raw instanceof Map<?, ?> submissionsMap)) {
             return List.of();
         }

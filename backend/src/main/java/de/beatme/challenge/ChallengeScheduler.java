@@ -6,6 +6,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.database.GenericTypeIndicator;
+import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,10 +24,9 @@ public class ChallengeScheduler {
 
     @Scheduled(cron = "0 0 0 * * *") // jeden Tag um 00:00 Uhr
     public void assignDailyChallenges() throws Exception {
-        Firestore db = FirestoreClient.getFirestore();
 
-        List<QueryDocumentSnapshot> allChallenges = db.collection("challenges").get().get().getDocuments();
-        List<QueryDocumentSnapshot> groups = db.collection("groups").get().get().getDocuments();
+        List<QueryDocumentSnapshot> allChallenges = FirebaseConfig.db.collection("challenges").get().get().getDocuments();
+        List<QueryDocumentSnapshot> groups = FirebaseConfig.db.collection("groups").get().get().getDocuments();
 
         for (DocumentSnapshot groupDoc : groups) {
             List<String> completed = (List<String>) groupDoc.get("completedChallenges");
@@ -43,7 +43,7 @@ public class ChallengeScheduler {
                     .orElse(null);
 
             if (newChallengeId != null) {
-                db.collection("groups").document(groupDoc.getId())
+                FirebaseConfig.db.collection("groups").document(groupDoc.getId())
                         .update(Map.of(
                                 "currentChallengeId", newChallengeId,
                                 "challengeAssignedAt", LocalDate.now().toString(),
