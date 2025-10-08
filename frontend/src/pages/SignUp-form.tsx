@@ -67,12 +67,12 @@ export function SignUpForm({
                         errorMessage = errorData.error || errorMessage;
                     }
                 } catch (e) {}
-                throw new Error(errorMessage);
+                console.error(errorMessage);
             }
 
             const responseData = await res.json();
             console.log("Registrierung erfolgreich:", responseData);
-            navigate('/login')
+            navigate('/home')
         } catch (err: any) {
             console.error("Registrierungsfehler:", err);
             setError(err.message || "An unexpected error occurred.");
