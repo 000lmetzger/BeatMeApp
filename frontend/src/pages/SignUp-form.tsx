@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import { API_URL } from "../config/config.js";
 
 export function SignUpForm({
                               className,
@@ -36,7 +36,7 @@ export function SignUpForm({
                     return;
         }
 
-        const apiUrl = "http://localhost:8080/users";
+        const apiUrl = (API_URL + "/users");
 
         const userRequest = {
             username,
