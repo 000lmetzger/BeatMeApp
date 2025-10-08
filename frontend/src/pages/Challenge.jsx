@@ -61,7 +61,7 @@ export function Challenge() {
             }
         }
         fetchChallenge();
-    }, [group.groupId]);
+    }, [group.groupId, challengeDone]);
 
     const openCamera = () => cameraInputRef.current?.click();
     const openFileBrowser = () => fileInputRef.current?.click();
