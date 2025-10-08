@@ -1,14 +1,23 @@
 import { useState } from "react";
 import VotingCard from "./VotingCard.jsx";
+import {useGroup} from "../context/GroupContext.jsx";
 
-function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }) {
+function VotingImagesOverview({ pointsGiven, setPointsGiven, imageData, setImageData }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const { group } = useGroup();
 
     const handleCardClick = (user) => {
         setSelectedUser(user);
         setIsModalOpen(true);
     };
+
+    const uidToUsername = (uid) => {
+        for (let user of group.members){
+            if (user.uid === uid) return user.username;
+        }
+        return "No username";
+    }
 
     const changeOrderOfImages = (v) => {
         return v.sort((a, b) => b.points - a.points);
@@ -17,10 +26,10 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
     const voted = (selected_user, points) => {
         let new_voting_obj = [];
         let adjust_user = {};
-        for (const u of voting){
-            if(u.name === selected_user.name){
-                adjust_user.name = selected_user.name;
-                adjust_user.image = selected_user.image;
+        for (const u of imageData){
+            if(u.uid === selected_user.uid){
+                adjust_user.uid = selected_user.uid;
+                adjust_user.url = selected_user.url;
                 adjust_user.points = points;
                 new_voting_obj.push(adjust_user);
             }
@@ -29,15 +38,15 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
             }
         }
         setPointsGiven([...pointsGiven, points]);
-        setVoting(new_voting_obj);
+        setImageData(new_voting_obj);
         setIsModalOpen(false);
     }
 
     return (
         <div className="flex-1 overflow-y-auto min-h-0 w-full p-4 pb-20">
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                {voting && voting.length > 0 ? (
-                    changeOrderOfImages(voting).map((item, index) => (
+                {imageData && imageData.length > 0 ? (
+                    changeOrderOfImages(imageData).map((item, index) => (
                         <div key={item.id ?? index} onClick={() => handleCardClick(item)}>
                             <VotingCard user={item}/>
                         </div>
@@ -56,10 +65,10 @@ function VotingImagesOverview({ voting, setVoting, pointsGiven, setPointsGiven }
                         >
                             ✕
                         </button>
-                        <h2 className="font-bold text-lg text-center">{selectedUser.name}</h2>
+                        <h2 className="font-bold text-lg text-center">{uidToUsername(selectedUser.uid)}</h2>
                         <img
-                            src={selectedUser.image}
-                            alt={selectedUser.name}
+                            src={selectedUser.url}
+                            alt={uidToUsername(selectedUser.uid)}
                             className="mt-4 rounded-lg w-full"
                         />
                         <div className="mt-5 mb-2">{((selectedUser.points === 2)||(selectedUser.points === 3)) ? <p>You have already voted: {selectedUser.points} Points</p> : (selectedUser.points === 1) ? <p>Vote for this image: 1 Point </p> : (pointsGiven.length >= 3) ? <p>Voting completed</p> : <p>Vote for this image:</p>}</div>

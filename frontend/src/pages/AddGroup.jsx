@@ -13,6 +13,7 @@ function AddGroup() {
 
     const handleJoin = async () => {
         try {
+            const token = localStorage.getItem("firebaseToken");
             const url = new URL(`${API_URL}/groups/join`);
             url.searchParams.append("uid", user.uid);
             url.searchParams.append("inviteId", "#" + groupId);
@@ -21,20 +22,20 @@ function AddGroup() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 },
             });
 
             if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || "Could not join group");
+                const errorData = await response.json();
+                console.error(errorData.error || `Join group failed with status ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Successfully joined group:", data);
-            navigate("/home");
+            console.log("Joined group successfully:", data);
+            navigate('/home');
         } catch (err) {
-            console.error("Error joining group:", err);
-            throw err;
+            console.error("Error joining group:", err.message);
         }
     };
 

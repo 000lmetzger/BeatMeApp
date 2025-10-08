@@ -6,8 +6,7 @@ import { useGroup } from "../context/GroupContext.jsx";
 function Voting() {
     const { group } = useGroup();
     const [pointsGiven, setPointsGiven] = useState([]);
-    const [voting, setVoting] = useState([]);
-    const [previousVoting, setPreviousVoting] = useState([]);
+    const [imageData, setImageData] = useState([]);
 
     const token = localStorage.getItem("firebaseToken");
     const headers = {
@@ -29,10 +28,9 @@ function Voting() {
                     console.error(`Fehler beim Laden der vorherigen Submissions: ${response.status}`);
                     return;
                 }
-
                 const data = await response.json();
-                setPreviousVoting(data);
-                console.log("Vorherige Challenge Submissions:", data);
+                const dataWithPoints = data.map((item) => ({ ...item, points: 0 }));
+                setImageData(dataWithPoints);
             } catch (error) {
                 console.error("Fehler beim Laden der vorherigen Submissions:", error);
             }
@@ -53,7 +51,7 @@ function Voting() {
             }
 
             const data = await response.json();
-            console.log("✅ Vote erfolgreich:", data);
+            console.log("Vote erfolgreich:", data);
             return data;
         } catch (err) {
             console.error("Fehler beim Voten:", err);
@@ -65,10 +63,10 @@ function Voting() {
             <h1 className="font-bold p-5">Voting</h1>
             <div className="w-full h-full flex flex-col">
                 <VotingImagesOverview
-                    voting={voting}
-                    setVoting={setVoting}
                     pointsGiven={pointsGiven}
                     setPointsGiven={setPointsGiven}
+                    imageData = {imageData}
+                    setImageData={setImageData}
                 />
             </div>
         </div>
