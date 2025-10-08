@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { useUser } from '../context/UserContext.jsx';
 import { API_URL } from "../config/config.js";
 import {useGroup} from "../context/GroupContext.jsx";
+import Submitted from "../components/Submitted.jsx";
+import NotSubmitted from "../components/NotSubmitted.jsx";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -15,11 +16,10 @@ export function Challenge() {
     const [successMessage, setSuccessMessage] = useState(null);
     const [challenge, setChallenge] = useState(null);
     const [dummyNotice, setDummyNotice] = useState(false);
+    const [ challengeDone, setChallengeDone ] = useState(true);
 
     const fileInputRef = useRef(null);
     const cameraInputRef = useRef(null);
-
-    console.log(group);
 
     useEffect(() => {
         async function fetchChallenge() {
@@ -40,10 +40,26 @@ export function Challenge() {
                 setChallenge(data);
             } catch (err) {
                 setDummyNotice(true);
-                setChallenge({ challenge: "Dummy Challenge", description: "This is a placeholder challenge because no active challenge was found." });
+                setChallenge({ challenge: "No Challenge found", description: "" +
+                        "" });
+            }
+            try {
+                const token = localStorage.getItem("firebaseToken");
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                };
+
+                const res = await fetch(`${API_URL}/challenges/group/${group.groupId}/current/submission`, { headers });
+                if (!res.ok) {
+                    console.error("Error loading challenge");
+                }
+                const data = await res.json();
+                setChallengeDone(data);
+            } catch (err) {
+                console.error("Error loading challenge");
             }
         }
-
         fetchChallenge();
     }, [group.groupId]);
 
@@ -96,7 +112,7 @@ export function Challenge() {
             }
 
             setSuccessMessage("Successfully submitted!");
-            setFile(null); // Optional: clear file after success
+            setFile(null);
         } catch (err) {
             console.error("Upload error:", err);
             setError(err.message || "An unexpected upload error occurred.");
@@ -130,25 +146,23 @@ export function Challenge() {
                 </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={openCamera} style={buttonStyle} disabled={loading}>📸 Open Camera</button>
-                    <button onClick={openFileBrowser} style={outlineButtonStyle} disabled={loading}>📂 Select from Storage</button>
-                </div>
-
-                {loading && <p style={{ color: 'blue' }}>Uploading...</p>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-
-                {file && !loading && !successMessage && (
-                    <div style={{ marginTop: '10px', padding: '10px', border: '1px dashed #ccc', borderRadius: '4px' }}>
-                        <p>File ready: <strong>{file.name}</strong></p>
-                    </div>
-                )}
-
-                <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: 'none' }} />
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-            </div>
+            {challengeDone.submitted && <Submitted image={challengeDone}/>}
+            {!challengeDone.submitted &&
+                <NotSubmitted
+                    {...{
+                        error,
+                        successMessage,
+                        file,
+                        cameraInputRef,
+                        fileInputRef,
+                        handleFileChange,
+                        openCamera,
+                        buttonStyle,
+                        openFileBrowser,
+                        outlineButtonStyle,
+                        loading
+                    }}
+                />}
         </div>
     );
 }
