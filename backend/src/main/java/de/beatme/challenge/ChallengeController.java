@@ -37,14 +37,14 @@ public class ChallengeController {
         }
     }
 
-    @GetMapping("/group/{groupId}/current/submitted")
-    public ResponseEntity<?> hasUserSubmittedCurrentChallenge(
+    @GetMapping("/group/{groupId}/current/submission")
+    public ResponseEntity<?> getUserSubmissionForCurrentChallenge(
             @PathVariable String groupId,
             Authentication authentication) {
         try {
             String uid = authentication.getName();
-            boolean submitted = challengeService.hasUserSubmittedCurrentChallenge(groupId, uid);
-            return ResponseEntity.ok(Map.of("submitted", submitted));
+            Map<String, Object> submission = challengeService.getUserSubmissionForCurrentChallenge(groupId, uid);
+            return ResponseEntity.ok(submission);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

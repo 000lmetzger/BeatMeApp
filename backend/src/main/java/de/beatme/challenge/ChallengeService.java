@@ -55,7 +55,7 @@ public class ChallengeService {
         return challenges;
     }
 
-    public boolean hasUserSubmittedCurrentChallenge(String groupId, String uid) throws Exception {
+    public Map<String, Object> getUserSubmissionForCurrentChallenge(String groupId, String uid) throws Exception {
         DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
@@ -68,15 +68,25 @@ public class ChallengeService {
 
         Map<String, Object> submissions = (Map<String, Object>) groupDoc.get("submissions");
         if (submissions == null || submissions.isEmpty()) {
-            return false;
+            return Map.of("submitted", false);
         }
 
         Map<String, Object> challengeSubmissions = (Map<String, Object>) submissions.get(currentChallengeId);
         if (challengeSubmissions == null) {
-            return false;
+            return Map.of("submitted", false);
         }
 
-        return challengeSubmissions.containsKey(uid);
+        Object userSubmissionObj = challengeSubmissions.get(uid);
+        if (!(userSubmissionObj instanceof Map<?, ?> userSubmission)) {
+            return Map.of("submitted", false);
+        }
+
+        return Map.of(
+                "submitted", true,
+                "url", userSubmission.get("url"),
+                "type", userSubmission.get("type"),
+                "timestamp", userSubmission.get("timestamp")
+        );
     }
 }
 
