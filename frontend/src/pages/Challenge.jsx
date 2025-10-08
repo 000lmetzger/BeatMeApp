@@ -16,7 +16,7 @@ export function Challenge() {
     const [successMessage, setSuccessMessage] = useState(null);
     const [challenge, setChallenge] = useState(null);
     const [dummyNotice, setDummyNotice] = useState(false);
-    const [ challengeDone, setChallengeDone ] = useState(true);
+    const [challengeDone, setChallengeDone] = useState(true);
 
     const fileInputRef = useRef(null);
     const cameraInputRef = useRef(null);

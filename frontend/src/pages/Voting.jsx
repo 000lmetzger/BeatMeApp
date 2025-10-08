@@ -19,6 +19,11 @@ function Voting() {
             if (!group?.groupId) return;
 
             try {
+                const token = localStorage.getItem("firebaseToken");
+                const headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                };
                 const response = await fetch(
                     `${API_URL}/groups/${group.groupId}/challenges/previous/submissions`,
                     { headers }
@@ -40,6 +45,11 @@ function Voting() {
 
     async function vote({ challengeId, userId, votedFor, position }) {
         try {
+            const token = localStorage.getItem("firebaseToken");
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            };
             const response = await fetch(
                 `${API_URL}/groups/${group.groupId}/challenges/${challengeId}/vote/${position}?uid=${userId}&votedFor=${votedFor}`,
                 { method: "POST", headers }
@@ -67,6 +77,7 @@ function Voting() {
                     setPointsGiven={setPointsGiven}
                     imageData = {imageData}
                     setImageData={setImageData}
+                    vote={vote}
                 />
             </div>
         </div>
