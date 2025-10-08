@@ -13,6 +13,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -20,8 +21,16 @@ import java.util.Map;
 public class UserService {
 
     @SneakyThrows
-    public CreateUserResponse createNewUser(String uid, CreateUserRequest request, MultipartFile profilePic) {
+    public CreateUserResponse createNewUser(CreateUserRequest request, MultipartFile profilePic) {
         try {
+            UserRecord.CreateRequest authRequest = new UserRecord.CreateRequest()
+                    .setEmail(request.getEmail())
+                    .setPassword(request.getPassword())
+                    .setDisplayName(request.getUsername());
+
+            UserRecord userRecord = FirebaseAuth.getInstance().createUser(authRequest);
+            String uid = userRecord.getUid();
+
             String profileUrl = null;
             if (profilePic != null && !profilePic.isEmpty()) {
                 String contentType = profilePic.getContentType();
@@ -32,16 +41,17 @@ public class UserService {
                 }
             }
 
-            Map<String, Object> user = Map.of(
-                    "uid", uid,
-                    "username", request.getUsername(),
-                    "email", request.getEmail(),
-                    "profilePicture", profileUrl
-            );
+            Map<String, Object> user = new HashMap<>();
+            user.put("uid", uid);
+            user.put("username", request.getUsername());
+            user.put("email", request.getEmail());
+            user.put("profilePicture", profileUrl);
+            user.put("groups", new HashMap<>());
 
-            FirebaseConfig.db.collection("users").document(uid).set(user).get();
+            Firestore db = FirebaseConfig.db;
+            db.collection("users").document(uid).set(user).get();
 
-            LogController.logSuccess("User successfully created - uid: " + uid + ", username: " + request.getUsername() + ", email: " + request.getEmail());
+            LogController.logSuccess("User successfully created in Firebase + Firestore: " + request.getEmail());
             return new CreateUserResponse(uid, request.getUsername(), request.getEmail(), profileUrl);
 
         } catch (Exception e) {
@@ -50,7 +60,8 @@ public class UserService {
         }
     }
 
-    public String uploadProfilePicture(String uid, byte[] fileBytes) throws Exception {
+
+    public String uploadProfilePicture(String uid, byte[] fileBytes) {
         Bucket bucket = StorageClient.getInstance().bucket();
 
         String fileName = "users/" + uid + "/profile.jpg";

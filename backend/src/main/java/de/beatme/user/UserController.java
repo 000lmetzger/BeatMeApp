@@ -22,17 +22,9 @@ public class UserController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createUser(@RequestPart("user") CreateUserRequest userRequest,
-                                        @RequestPart(value = "profilePic", required = false) MultipartFile profilePic,
-                                        Authentication authentication) {
+                                        @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) {
         try {
-            String uid = authentication.getName();
-            if (profilePic != null && !profilePic.isEmpty()) {
-                String contentType = profilePic.getContentType();
-                if (contentType == null || !contentType.startsWith("image/")) {
-                    return ResponseEntity.badRequest().body(Map.of("error", "Please upload an image (jpg, png, ...)"));
-                }
-            }
-            CreateUserResponse response = userService.createNewUser(uid, userRequest, profilePic);
+            var response = userService.createNewUser(userRequest, profilePic);
             LogController.logSuccess("User successfully created");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
