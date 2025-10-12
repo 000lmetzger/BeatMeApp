@@ -1,8 +1,6 @@
 package de.beatme.challenge;
 
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
 import de.beatme.firebase.FirebaseConfig;
 import org.springframework.stereotype.Service;
 

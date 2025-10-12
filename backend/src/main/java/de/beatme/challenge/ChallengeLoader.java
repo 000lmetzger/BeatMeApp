@@ -2,13 +2,10 @@ package de.beatme.challenge;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
 import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;

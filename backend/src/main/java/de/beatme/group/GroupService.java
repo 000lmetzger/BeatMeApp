@@ -4,12 +4,10 @@ import com.google.cloud.firestore.*;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
-import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.cloud.StorageClient;
 import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
 import de.beatme.user.User;
-import de.beatme.voting.ResultEntry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

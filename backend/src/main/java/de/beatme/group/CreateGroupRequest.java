@@ -1,6 +1,5 @@
 package de.beatme.group;
 
-import de.beatme.challenge.Challenge;
 import de.beatme.user.User;
 import lombok.Data;
 import java.util.List;
