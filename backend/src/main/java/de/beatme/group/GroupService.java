@@ -277,7 +277,6 @@ public class GroupService {
         }
 
         Map<String, Object> result = new HashMap<>();
-        result.put("challenge", challengeData);
         result.put("submissions", submissions);
 
         return result;
