@@ -65,6 +65,18 @@ function DisplaySingleGroupInUserHome({ group_information }) {
         }
     }, [cDone])
 
+    const submissionCount = yesterdayData?.submissions?.length || 0;
+    const votesGiven = [votingDone.first, votingDone.second, votingDone.third]
+        .filter(v => v != null).length;
+
+    let votingStatus;
+    if (submissionCount === 0) {
+        votingStatus = "no_voting";
+    } else if (votesGiven >= submissionCount) {
+        votingStatus = "done";
+    } else {
+        votingStatus = "vote_now";
+    }
 
     return (
         <div
@@ -89,22 +101,25 @@ function DisplaySingleGroupInUserHome({ group_information }) {
                     {challengeDone && (
                         <div className="bg-green-400 text-white p-1 rounded text-sm">✓</div>
                     )}
-                    {(votingDone.first != null || votingDone.second != null || votingDone.third != null) ? (
+                    {votingStatus === "no_voting" && (
+                        <div className="bg-gray-400 text-white px-2 py-1 rounded text-xs transition">
+                            No Voting
+                        </div>
+                    )}
+                    {votingStatus === "vote_now" && (
                         <div
                             className="bg-red-400 text-white px-2 py-1 rounded text-xs transition"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             Vote Now
                         </div>
-                    ) : (
-                        <div
-                            className="bg-blue-400 text-white px-2 py-1 rounded text-xs transition"
-                        >
+                    )}
+                    {votingStatus === "done" && (
+                        <div className="bg-gray-400 text-white px-2 py-1 rounded text-xs transition">
                             Voting done
                         </div>
                     )}
+
                 </div>
             </div>
 
