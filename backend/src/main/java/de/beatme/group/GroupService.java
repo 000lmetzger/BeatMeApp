@@ -226,41 +226,60 @@ public class GroupService {
         return fileUrl;
     }
 
-    public List<Map<String, Object>> getSubmissionsOfPreviousChallenge(String groupId, String uid) throws Exception {
-        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
+    public Map<String, Object> getSubmissionsOfPreviousChallenge(String groupId, String uid) throws Exception {
+        Firestore db = FirebaseConfig.db;
+        DocumentSnapshot groupDoc = db.collection("groups").document(groupId).get().get();
+
         if (!groupDoc.exists()) {
             throw new RuntimeException("Group not found");
         }
 
         List<String> completedChallenges = (List<String>) groupDoc.get("completedChallenges");
-        if (completedChallenges == null || completedChallenges.size() < 2) {
+        if (completedChallenges == null || completedChallenges.isEmpty()) {
             throw new RuntimeException("No previous challenge available");
         }
 
-        String previousChallengeId = completedChallenges.get(completedChallenges.size() - 2);
-
-        Object raw = groupDoc.get("submissions." + previousChallengeId);
-        if (!(raw instanceof Map<?, ?> submissionsMap)) {
-            return List.of();
+        String previousChallengeId;
+        if (completedChallenges.size() >= 2) {
+            previousChallengeId = completedChallenges.get(completedChallenges.size() - 2);
+        } else {
+            previousChallengeId = completedChallenges.get(0);
         }
 
+        DocumentSnapshot challengeDoc = db.collection("challenges").document(previousChallengeId).get().get();
+        if (!challengeDoc.exists()) {
+            throw new RuntimeException("Challenge data not found for ID: " + previousChallengeId);
+        }
+
+        Map<String, Object> challengeData = challengeDoc.getData();
+
+        Object raw = groupDoc.get("submissions." + previousChallengeId);
         List<Map<String, Object>> submissions = new ArrayList<>();
 
-        for (Map.Entry<?, ?> entry : submissionsMap.entrySet()) {
-            String userId = (String) entry.getKey();
-            if (userId.equals(uid)) continue;
+        if (raw instanceof Map<?, ?> submissionsMap) {
+            for (Map.Entry<?, ?> entry : submissionsMap.entrySet()) {
+                String userId = (String) entry.getKey();
+                if (userId.equals(uid)) continue;
 
-            Object submissionObj = entry.getValue();
-            if (submissionObj instanceof Map<?, ?> submissionData) {
-                Map<String, Object> submission = new HashMap<>();
-                submission.put("uid", userId);
-                submission.put("url", submissionData.get("url"));
-                submission.put("type", submissionData.get("type"));
-                submission.put("timestamp", submissionData.get("timestamp"));
-                submissions.add(submission);
+                Object submissionObj = entry.getValue();
+                if (submissionObj instanceof Map<?, ?> submissionData) {
+                    Map<String, Object> submission = new HashMap<>();
+                    submission.put("uid", userId);
+                    submission.put("url", submissionData.get("url"));
+                    submission.put("type", submissionData.get("type"));
+                    submission.put("timestamp", submissionData.get("timestamp"));
+
+                    submission.put("challenge", challengeData);
+
+                    submissions.add(submission);
+                }
             }
         }
 
-        return submissions;
+        Map<String, Object> result = new HashMap<>();
+        result.put("challenge", challengeData);
+        result.put("submissions", submissions);
+
+        return result;
     }
 }
