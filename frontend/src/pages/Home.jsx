@@ -1,45 +1,37 @@
 import HeaderBar from "../components/HeaderBar.jsx";
 import PageBelowHeaderBar from "../components/PageBelowHeaderBar.jsx";
 import DisplaySingleGroupInUserHome from "../components/DisplaySingleGroupInUserHome.jsx";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useSWR from "swr";
 import { API_URL } from "../config/config.js";
 import { useUser } from "../context/UserContext.jsx";
 
+const fetcher = async (url) => {
+    const token = localStorage.getItem("firebaseToken");
+    const response = await fetch(url, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error("Could not load group_data");
+    }
+    return response.json();
+};
+
 function Home() {
     const { user } = useUser();
-    const [groups, setGroups] = useState([]);
     const navigate = useNavigate();
 
     const handleClick = () => {
         navigate("/add-group");
     };
 
-    useEffect(() => {
-        if (!user?.uid) return;
-
-        const fetchGroups = async () => {
-            try {
-                const token = localStorage.getItem("firebaseToken");
-                const headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                };
-
-                const response = await fetch(`${API_URL}/groups/user`, { headers });
-                if (!response.ok) {
-                    console.error("Could not load group_data");
-                    return;
-                }
-                const data = await response.json();
-                setGroups(data);
-            } catch (err) {
-                console.error("Error fetching groups:", err);
-            }
-        };
-
-        fetchGroups();
-    }, [user?.uid]);
+    const { data: groups, error, isLoading } = useSWR(
+        user?.uid ? `${API_URL}/groups/user` : null,
+        fetcher
+    );
 
     if (!user) {
         return (
@@ -49,12 +41,28 @@ function Home() {
         );
     }
 
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Lade Gruppen...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center items-center h-screen text-red-500">
+                Fehler beim Laden der Gruppen: {error.message}
+            </div>
+        );
+    }
+
     return (
         <div className="h-screen w-screen flex flex-col">
             <HeaderBar enable_back={false} />
             <PageBelowHeaderBar className="flex-1 overflow-y-auto">
                 <div className="flex flex-col w-full gap-3 p-3">
-                    {groups.map((group, index) => (
+                    {groups?.map((group, index) => (
                         <DisplaySingleGroupInUserHome
                             key={index}
                             group_information={group}
