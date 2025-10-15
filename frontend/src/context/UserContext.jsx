@@ -1,29 +1,62 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // Optional, falls Komponenten warten sollen
 
     useEffect(() => {
         const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        const db = getFirestore();
+
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                setUser({
-                    uid: firebaseUser.uid,
-                    email: firebaseUser.email,
-                });
+                try {
+                    const userDocRef = doc(db, "users", firebaseUser.uid);
+                    const userSnap = await getDoc(userDocRef);
+
+                    if (userSnap.exists()) {
+                        const data = userSnap.data();
+                        setUser({
+                            uid: firebaseUser.uid,
+                            email: firebaseUser.email,
+                            username: data.username || null,
+                            profilePicture: data.profilePicture || null,
+                            groups: data.groups || [],
+                        });
+                    } else {
+                        setUser({
+                            uid: firebaseUser.uid,
+                            email: firebaseUser.email,
+                            username: null,
+                            profilePicture: null,
+                            groups: [],
+                        });
+                    }
+                } catch (err) {
+                    console.error("Fehler beim Laden der User-Daten:", err);
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        username: null,
+                        profilePicture: null,
+                        groups: [],
+                    });
+                }
             } else {
                 setUser(null);
             }
+            setLoading(false);
         });
 
         return () => unsubscribe();
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, loading }}>
             {children}
         </UserContext.Provider>
     );

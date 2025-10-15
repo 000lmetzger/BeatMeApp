@@ -27,9 +27,9 @@ function Home() {
     const handleClick = () => {
         navigate("/add-group");
     };
-
+    const token = localStorage.getItem("firebaseToken");
     const { data: groups, error, isLoading } = useSWR(
-        user?.uid ? `${API_URL}/groups/user` : null,
+        user?.uid && token ? `${API_URL}/groups/user` : null,
         fetcher
     );
 

@@ -97,41 +97,43 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                                     {selectedUser.points === 1 ? "Point" : "Points"}
                                 </p>
                             ) : (
-                                <p>Vote for this image:</p>
+                                <>
+                                    <p>Vote for this image:</p>
+                                    <div className="flex flex-row justify-between mt-2">
+                                        {availablePoints.includes(3) && (
+                                            <button
+                                                style={{ backgroundColor: "gold" }}
+                                                onClick={() => handleVote(3)}
+                                                className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
+                                            >
+                                                3<br />Points
+                                            </button>
+                                        )}
+
+                                        {availablePoints.includes(2) && (
+                                            <button
+                                                style={{ backgroundColor: "silver" }}
+                                                onClick={() => handleVote(2)}
+                                                className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
+                                            >
+                                                2<br />Points
+                                            </button>
+                                        )}
+
+                                        {availablePoints.includes(1) && (
+                                            <button
+                                                style={{ backgroundColor: "#e8812c" }}
+                                                onClick={() => handleVote(1)}
+                                                className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
+                                            >
+                                                1<br />Point
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
                             )}
                         </div>
 
-                        <div className="flex flex-row justify-between">
-                            {availablePoints.includes(3) && (
-                                <button
-                                    style={{ backgroundColor: "gold" }}
-                                    onClick={() => handleVote(3)}
-                                    className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
-                                >
-                                    3<br />Points
-                                </button>
-                            )}
-
-                            {availablePoints.includes(2) && (
-                                <button
-                                    style={{ backgroundColor: "silver" }}
-                                    onClick={() => handleVote(2)}
-                                    className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
-                                >
-                                    2<br />Points
-                                </button>
-                            )}
-
-                            {availablePoints.includes(1) && (
-                                <button
-                                    style={{ backgroundColor: "#e8812c" }}
-                                    onClick={() => handleVote(1)}
-                                    className="p-2 rounded text-white font-bold hover:opacity-90 transition-opacity duration-200"
-                                >
-                                    1<br />Point
-                                </button>
-                            )}
-                        </div>
                     </div>
                 </div>
             )}

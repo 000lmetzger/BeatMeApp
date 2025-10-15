@@ -37,12 +37,6 @@ function Voting() {
         fetcher
     );
 
-    useEffect(() => {
-        if (votesData) {
-            console.log("Votes for challenge:", votesData);
-        }
-    }, [votesData]);
-
     async function vote(cid, userId, votedFor, position) {
         try {
             const token = localStorage.getItem("firebaseToken");
@@ -74,6 +68,8 @@ function Voting() {
     return (
         <div className="bg-gray-100 flex flex-1 flex-col justify-between items-center">
             <h1 className="font-bold p-5">Voting</h1>
+            <b>{yesterdayChallenge.challenge}</b>
+            <div>{yesterdayChallenge.description}</div>
             <div className="w-full h-full flex flex-col">
                 <VotingImagesOverview
                     imageData={imageData}
