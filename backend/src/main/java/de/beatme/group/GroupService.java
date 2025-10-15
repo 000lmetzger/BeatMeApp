@@ -268,16 +268,13 @@ public class GroupService {
                     submission.put("url", submissionData.get("url"));
                     submission.put("type", submissionData.get("type"));
                     submission.put("timestamp", submissionData.get("timestamp"));
-
-                    submission.put("challenge", challengeData);
-
                     submissions.add(submission);
                 }
             }
         }
 
         Map<String, Object> result = new HashMap<>();
-        result.put("submissions", submissions);
+        result.put("challenge", challengeData);
 
         return result;
     }
