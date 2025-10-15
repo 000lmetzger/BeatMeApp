@@ -280,4 +280,28 @@ public class GroupService {
 
         return result;
     }
+
+    public Map<String, Object> getUserVotesForChallenge(String groupId, String challengeId, String uid) throws Exception {
+        DocumentSnapshot groupDoc = FirebaseConfig.db.collection("groups").document(groupId).get().get();
+
+        if (!groupDoc.exists()) {
+            throw new RuntimeException("Group not found");
+        }
+
+        Object rawVotes = groupDoc.get("votes." + challengeId + "." + uid);
+        if (!(rawVotes instanceof Map<?, ?> userVotes)) {
+            throw new RuntimeException("No votes found for this user in this challenge");
+        }
+
+        String first = (String) userVotes.get("first");
+        String second = (String) userVotes.get("second");
+        String third = (String) userVotes.get("third");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("first", first);
+        response.put("second", second);
+        response.put("third", third);
+
+        return response;
+    }
 }

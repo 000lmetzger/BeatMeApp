@@ -138,4 +138,18 @@ public class GroupController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/{groupId}/challenges/{challengeId}/votes")
+    public ResponseEntity<?> getUserVotes(
+            @PathVariable String groupId,
+            @PathVariable String challengeId,
+            Authentication authentication) {
+        try {
+            String uid = authentication.getName();
+            Map<String, Object> votes = groupService.getUserVotesForChallenge(groupId, challengeId, uid);
+            return ResponseEntity.ok(votes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
