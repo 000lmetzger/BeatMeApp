@@ -268,6 +268,7 @@ public class GroupService {
                     submission.put("url", submissionData.get("url"));
                     submission.put("type", submissionData.get("type"));
                     submission.put("timestamp", submissionData.get("timestamp"));
+
                     submissions.add(submission);
                 }
             }
@@ -275,6 +276,7 @@ public class GroupService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("challenge", challengeData);
+        result.put("submissions", submissions);
 
         return result;
     }
