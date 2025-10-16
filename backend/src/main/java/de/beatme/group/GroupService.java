@@ -98,8 +98,16 @@ public class GroupService {
             throw new RuntimeException("User not found");
         }
 
-        List<String> groupIds = (List<String>) userDoc.get("groups");
-        if (groupIds == null || groupIds.isEmpty()) {
+        Object groupsObj = userDoc.get("groups");
+        List<String> groupIds = new ArrayList<>();
+
+        if (groupsObj instanceof Map) {
+            groupIds.addAll(((Map<String, Object>) groupsObj).keySet());
+        } else if (groupsObj instanceof List) {
+            groupIds.addAll((List<String>) groupsObj);
+        }
+
+        if (groupIds.isEmpty()) {
             return List.of();
         }
 
