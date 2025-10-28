@@ -4,8 +4,25 @@ import { API_URL } from "../config/config.js";
 import { useGroup } from "../context/GroupContext.jsx";
 import Submitted from "../components/Submitted.jsx";
 import NotSubmitted from "../components/NotSubmitted.jsx";
+import useSWR from "swr";
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+const fetcher = async (url) => {
+  const token = localStorage.getItem("firebaseToken");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(url, { headers });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    const message = errorData.error || `Fetch error (Status: ${res.status})`;
+    throw new Error(message);
+  }
+
+  return res.json();
+};
 
 export function Challenge() {
   const { user } = useUser();
@@ -14,66 +31,25 @@ export function Challenge() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [challenge, setChallenge] = useState(null);
   const [dummyNotice, setDummyNotice] = useState(false);
-  const [challengeDone, setChallengeDone] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      if (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua)) {
-        setIsMobile(true);
-      } else {
-        setIsMobile(false);
-      }
-    };
-    checkMobile();
+    setIsMobile(/android|iPad|iPhone|iPod/i.test(navigator.userAgent));
   }, []);
 
-  useEffect(() => {
-    async function fetchChallenge() {
-      try {
-        const token = localStorage.getItem("firebaseToken");
-        const headers = {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        };
+  const { data: challenge, error: challengeError, isLoading: challengeLoading } = useSWR(
+      group?.groupId ? `${API_URL}/challenges/group/${group.groupId}/current` : null,
+      fetcher
+  );
 
-        const res = await fetch(`${API_URL}/challenges/group/${group.groupId}/current`, { headers });
-        if (!res.ok) {
-          setDummyNotice(true);
-          setChallenge({ challenge: "No Challenge found", description: "" });
-          return;
-        }
-        const data = await res.json();
-        setChallenge(data);
-      } catch (err) {
-        setDummyNotice(true);
-        setChallenge({ challenge: "No Challenge found", description: "" });
-      }
-      try {
-        const token = localStorage.getItem("firebaseToken");
-        const headers = {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        };
-
-        const res = await fetch(`${API_URL}/challenges/group/${group.groupId}/current/submission`, { headers });
-        if (!res.ok) {
-          console.error("Error loading challenge");
-        }
-        const data = await res.json();
-        setChallengeDone(data);
-      } catch (err) {
-        console.error("Error loading challenge");
-      }
-    }
-    fetchChallenge();
-  }, [group.groupId, challengeDone]);
+  const { data: challengeDone, error: submissionError, isLoading: submissionLoading } = useSWR(
+      group?.groupId ? `${API_URL}/challenges/group/${group.groupId}/current/submission` : null,
+      fetcher
+  );
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -101,7 +77,7 @@ export function Challenge() {
 
     try {
       const token = localStorage.getItem("firebaseToken");
-      const headers = { "Authorization": `Bearer ${token}` };
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       const res = await fetch(`${apiUrl}?uid=${uid}`, {
         method: "POST",
@@ -134,7 +110,7 @@ export function Challenge() {
     padding: '10px 15px',
     border: 'none',
     borderRadius: '4px',
-    cursor: 'pointer',
+    cursor: loading ? 'not-allowed' : 'pointer',
     fontWeight: 'bold',
     backgroundColor: loading ? '#aaa' : '#007bff',
     color: 'white',
@@ -144,37 +120,41 @@ export function Challenge() {
 
   const outlineButtonStyle = { ...buttonStyle, backgroundColor: 'white', border: '1px solid #007bff', color: '#007bff' };
 
+  if (challengeLoading || submissionLoading) return <p>Loading...</p>;
+  if (challengeError) return <p>Error loading challenge: {challengeError.message}</p>;
+  if (submissionError) return <p>Error loading submission: {submissionError.message}</p>;
+
   return (
-    <div className={cn("flex flex-col gap-6 max-w-md mx-auto mt-12 px-4")}>
-      {dummyNotice && <p style={{ color: 'orange', fontWeight: 'bold' }}>No challenge found, using dummy data.</p>}
+      <div className={cn("flex flex-col gap-6 max-w-md mx-auto mt-12 px-4")}>
+        {dummyNotice && <p style={{ color: 'orange', fontWeight: 'bold' }}>No challenge found, using dummy data.</p>}
 
-      {challenge && (
-        <div>
-          <h1 style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{challenge.challenge}</h1>
-          <p style={{ fontSize: '0.95em', color: '#555' }}>{challenge.description}</p>
-        </div>
-      )}
+        {challenge && (
+            <div>
+              <h1 style={{ fontSize: '1.5em', fontWeight: 'bold' }}>{challenge.challenge}</h1>
+              <p style={{ fontSize: '0.95em', color: '#555' }}>{challenge.description}</p>
+            </div>
+        )}
 
-      {challengeDone.submitted ? (
-        <Submitted image={challengeDone} />
-      ) : (
-        <NotSubmitted
-          {...{
-            error,
-            successMessage,
-            file,
-            cameraInputRef,
-            fileInputRef,
-            handleFileChange,
-            buttonStyle,
-            openFileBrowser: () => fileInputRef.current?.click(),
-            outlineButtonStyle,
-            loading,
-            isMobile
-          }}
-        />
-      )}
-    </div>
+        {challengeDone?.submitted ? (
+            <Submitted image={challengeDone} />
+        ) : (
+            <NotSubmitted
+                {...{
+                  error,
+                  successMessage,
+                  file,
+                  cameraInputRef,
+                  fileInputRef,
+                  handleFileChange,
+                  buttonStyle,
+                  openFileBrowser: () => fileInputRef.current?.click(),
+                  outlineButtonStyle,
+                  loading,
+                  isMobile
+                }}
+            />
+        )}
+      </div>
   );
 }
 
