@@ -6,7 +6,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // Optional, falls Komponenten warten sollen
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const auth = getAuth();

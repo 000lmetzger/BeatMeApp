@@ -1,5 +1,4 @@
 import VotingImagesOverview from "../components/VotingImagesOverview.jsx";
-import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { API_URL } from "../config/config.js";
 import { useGroup } from "../context/GroupContext.jsx";
