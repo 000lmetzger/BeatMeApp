@@ -50,7 +50,7 @@ function HeaderBar({ enable_back }) {
     return (
         <div className="relative">
             <nav
-                className="sticky top-0 z-50 bg-gradient-to-r from-[#003366] to-[#0055aa] text-white flex items-center justify-between px-6 shadow-md"
+                className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#003366] to-[#0055aa] text-white flex items-center justify-between px-6 shadow-md"
                 style={{ minHeight: "12vh", fontSize: "1.6rem" }}
             >
                 <div className="flex items-center">
@@ -82,7 +82,7 @@ function HeaderBar({ enable_back }) {
             {isModalOpen && (
                 <div
                     ref={modalRef}
-                    className="absolute top-[12vh] right-0 bg-blue-100 text-black rounded-lg shadow-lg w-28 z-40"
+                    className="fixed top-[12vh] right-0 bg-blue-100 text-black rounded-lg shadow-lg w-28 z-40"
                 >
                     <button
                         className="w-full text-center text-sm px-2 py-2 hover:bg-gray-100 rounded-lg"

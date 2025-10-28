@@ -1,9 +1,24 @@
 import { timeUntilMidnight } from "../utils/utils.js";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { API_URL } from "../config/config.js";
 import { useGroup } from "../context/GroupContext.jsx";
+
+// shadcn/ui
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
 
 function DisplaySingleGroupInUserHome({ group_information }) {
     const { setGroup } = useGroup();
+    const [challengeDone, setChallengeDone] = useState(false);
+    const [votingDone, setVotingDone] = useState({ first: null, second: null, third: null });
     const navigate = useNavigate();
 
     const navigateIntoGroup = (groupId, challenge) => {
@@ -11,17 +26,54 @@ function DisplaySingleGroupInUserHome({ group_information }) {
         navigate(`/group/${groupId}`, { state: { challenge } });
     };
 
-    const submissionCount =
-        group_information?.submissionCount ?? group_information?.yesterdayData?.submissions?.length ?? 0;
+    const fetcher = async (url) => {
+        const token = localStorage.getItem("firebaseToken");
+        const res = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            console.error("Fetch failed:", res.status, text);
+            throw new Error("Failed to fetch");
+        }
+        return res.json();
+    };
 
-    const votesGiven =
-        typeof group_information?.votesGiven === "number"
-            ? group_information.votesGiven
-            : group_information?.votesData && typeof group_information.votesData === "object"
-                ? Object.values(group_information.votesData).filter((v) => v != null).length
-                : 0;
+    const { data: cDone } = useSWR(
+        group_information?.groupId
+            ? `${API_URL}/challenges/group/${group_information.groupId}/current/submission`
+            : null,
+        fetcher
+    );
 
-    const challengeDone = group_information?.challengeDone ?? false;
+    const { data: yesterdayData } = useSWR(
+        group_information?.groupId
+            ? `${API_URL}/groups/${group_information.groupId}/challenges/previous/submissions`
+            : null,
+        fetcher
+    );
+
+    const yid = yesterdayData?.challenge?.challengeId;
+    const { data: votesData } = useSWR(
+        yid ? `${API_URL}/groups/${group_information.groupId}/challenges/${yid}/votes` : null,
+        fetcher
+    );
+
+    useEffect(() => {
+        setVotingDone(votesData || { first: null, second: null, third: null });
+    }, [votesData]);
+
+    useEffect(() => {
+        if (cDone) {
+            setChallengeDone(cDone.submitted);
+        }
+    }, [cDone]);
+
+    const submissionCount = yesterdayData?.submissions?.length || 0;
+    const votesGiven = [votingDone.first, votingDone.second, votingDone.third].filter((v) => v != null).length;
 
     let votingStatus;
     if (submissionCount === 0) {
@@ -33,42 +85,58 @@ function DisplaySingleGroupInUserHome({ group_information }) {
     }
 
     return (
-        <div
-            className="p-2 w-full h-[180px] border flex flex-col justify-between"
-            onClick={() => navigateIntoGroup(group_information.groupId, group_information?.yesterdayData?.challenge)}
+        <Card
+            className="w-full cursor-pointer rounded-xl border border-muted/60 bg-card/80 backdrop-blur-sm transition-all shadow-lg shadow-black/10 hover:shadow-2xl hover:shadow-black/20 hover:border-muted hover:-translate-y-0.5"
+            onClick={() => navigateIntoGroup(group_information.groupId, yesterdayData?.challenge)}
         >
-            <div className="flex flex-row justify-between">
-                <div className="flex items-center">
-                    <img
-                        src={group_information.groupPicture}
-                        alt="Gruppenbild"
-                        className="w-16 h-16 mr-2 rounded-md object-cover"
-                    />
-                    <div className="text-[160%]">{group_information.groupName}</div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                    {!challengeDone && <div className="bg-red-400 text-white p-1 rounded text-sm">{"Noch " + timeUntilMidnight()}</div>}
-                    {challengeDone && <div className="bg-green-400 text-white p-1 rounded text-sm">✓</div>}
-                    {votingStatus === "no_voting" && (
-                        <div className="bg-gray-400 text-white px-2 py-1 rounded text-xs transition">No Voting</div>
-                    )}
-                    {votingStatus === "vote_now" && (
-                        <div className="bg-red-400 text-white px-2 py-1 rounded text-xs transition" onClick={(e) => e.stopPropagation()}>
-                            Vote Now
-                        </div>
-                    )}
-                    {votingStatus === "done" && (
-                        <div className="bg-gray-400 text-white px-2 py-1 rounded text-xs transition">Voting done</div>
-                    )}
-                </div>
-            </div>
+            <CardContent className="p-4">
+                <div className="flex flex-row justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <Avatar className="h-16 w-16 rounded-md">
+                            <AvatarImage src={group_information.groupPicture} alt="Gruppenbild" className="object-cover" />
+                            <AvatarFallback className="rounded-md">GR</AvatarFallback>
+                        </Avatar>
+                        <div className="text-xl font-semibold truncate">{group_information.groupName}</div>
+                    </div>
 
-            <div className="text-[120%] mt-2">
-                <b>{group_information?.yesterdayData?.challenge?.challenge || "No challenge found"}</b>
-                <br />
-                {group_information?.yesterdayData?.challenge?.description || ""}
-            </div>
-        </div>
+                    <div className="flex flex-col items-end gap-1">
+                        {!challengeDone && (
+                            <Badge variant="destructive" className="text-[10px] px-2 py-1">
+                                {"Noch " + timeUntilMidnight()}
+                            </Badge>
+                        )}
+                        {challengeDone && (
+                            <Badge className="text-[10px] px-2 py-1 bg-green-500 hover:bg-green-500 text-white">✓</Badge>
+                        )}
+
+                        {votingStatus === "no_voting" && (
+                            <Badge variant="secondary" className="text-[10px] px-2 py-1">No Voting</Badge>
+                        )}
+
+                        {votingStatus === "vote_now" && (
+                            <Badge
+                                className="text-[10px] px-2 py-1 h-auto leading-none bg-slate-300 hover:bg-slate-400 text-slate-800 cursor-pointer transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                Vote Now
+                            </Badge>
+                        )}
+
+                        {votingStatus === "done" && (
+                            <Badge variant="outline" className="text-[10px] px-2 py-1 text-muted-foreground">
+                                Voting done
+                            </Badge>
+                        )}
+                    </div>
+                </div>
+
+                <div className="text-base mt-3">
+                    <b>{yesterdayData?.challenge?.challenge || "No challenge found"}</b>
+                    <br />
+                    {yesterdayData?.challenge?.description || ""}
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
