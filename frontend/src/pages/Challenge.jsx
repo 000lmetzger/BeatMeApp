@@ -143,7 +143,7 @@ export function Challenge() {
     // Premium loading state
     if (challengeLoading || submissionLoading) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl">
                     <CardHeader className="space-y-4">
                         <Skeleton className="h-8 w-3/4 rounded-xl" />
@@ -163,7 +163,7 @@ export function Challenge() {
 
     if (challengeError) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Alert className="rounded-2xl border-red-200 bg-red-50/80 backdrop-blur-sm">
                     <AlertDescription className="text-red-800 font-medium">
                         Error loading challenge: {challengeError.message}
@@ -175,7 +175,7 @@ export function Challenge() {
 
     if (submissionError) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Alert className="rounded-2xl border-red-200 bg-red-50/80 backdrop-blur-sm">
                     <AlertDescription className="text-red-800 font-medium">
                         Error loading submission: {submissionError.message}
@@ -186,7 +186,7 @@ export function Challenge() {
     }
 
     return (
-        <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+        <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
             {dummyNotice && (
                 <Alert className="mb-6 rounded-2xl border-amber-200 bg-gradient-to-r from-amber-50/90 to-orange-50/90 backdrop-blur-sm shadow-lg">
                     <AlertDescription className="text-amber-800 font-medium">

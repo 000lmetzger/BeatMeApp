@@ -297,8 +297,9 @@ public class GroupService {
         }
 
         Object rawVotes = groupDoc.get("votes." + challengeId + "." + uid);
+
         if (!(rawVotes instanceof Map<?, ?> userVotes)) {
-            throw new RuntimeException("No votes found for this user in this challenge");
+            return new HashMap<>();
         }
 
         String first = (String) userVotes.get("first");

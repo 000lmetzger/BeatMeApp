@@ -79,7 +79,6 @@ function HeaderBar({ enable_back }) {
                 </div>
             </nav>
 
-            {/* Spacer damit Content nicht abgeschnitten wird */}
             <div style={{ height: "12vh" }}></div>
 
             {isModalOpen && (

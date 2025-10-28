@@ -97,7 +97,7 @@ function Voting() {
     // Premium loading state
     if (isLoading) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl">
                     <CardHeader className="pb-6">
                         <div className="flex items-center gap-3 mb-4">
@@ -126,7 +126,7 @@ function Voting() {
 
     if (!token) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Alert className="rounded-2xl border-amber-200 bg-amber-50/80 backdrop-blur-sm">
                     <AlertDescription className="text-amber-800 font-medium">
                         Bitte einloggen, um Voting zu sehen.
@@ -138,7 +138,7 @@ function Voting() {
 
     if (error) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Alert className="rounded-2xl border-red-200 bg-red-50/80 backdrop-blur-sm">
                     <AlertDescription className="text-red-800 font-medium">
                         Fehler beim Laden der Submissions: {error.message}
@@ -149,7 +149,7 @@ function Voting() {
     }
 
     return (
-        <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+        <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
             <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-transparent to-pink-50/20 pointer-events-none" />
 

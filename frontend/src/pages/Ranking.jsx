@@ -41,7 +41,7 @@ function Ranking() {
     // Premium loading state
     if (isLoading) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl">
                     <CardHeader className="pb-6">
                         <div className="flex items-center gap-3 mb-4">
@@ -69,7 +69,7 @@ function Ranking() {
 
     if (error) {
         return (
-            <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+            <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
                 <Card className="rounded-2xl border-red-200 bg-red-50/80 backdrop-blur-sm">
                     <CardContent className="p-6">
                         <p className="text-red-800 font-medium">Error loading scores: {error.message}</p>
@@ -82,7 +82,7 @@ function Ranking() {
     const sortedScores = scores ? Object.entries(scores).sort(([, pointsA], [, pointsB]) => pointsB - pointsA) : [];
 
     return (
-        <div className="pt-[12vh] px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+        <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
             <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/30 via-transparent to-orange-50/20 pointer-events-none" />
 

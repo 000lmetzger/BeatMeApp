@@ -5,7 +5,6 @@ import useSWR from "swr";
 import { API_URL } from "../config/config.js";
 import { useGroup } from "../context/GroupContext.jsx";
 
-// shadcn/ui
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
