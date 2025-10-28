@@ -48,7 +48,7 @@ function HeaderBar({ enable_back }) {
     }, [isModalOpen]);
 
     return (
-        <div className="relative">
+        <>
             <nav
                 className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#003366] to-[#0055aa] text-white flex items-center justify-between px-6 shadow-md"
                 style={{ minHeight: "12vh", fontSize: "1.6rem" }}
@@ -79,6 +79,9 @@ function HeaderBar({ enable_back }) {
                 </div>
             </nav>
 
+            {/* Spacer damit Content nicht abgeschnitten wird */}
+            <div style={{ height: "12vh" }}></div>
+
             {isModalOpen && (
                 <div
                     ref={modalRef}
@@ -95,7 +98,7 @@ function HeaderBar({ enable_back }) {
                     </button>
                 </div>
             )}
-        </div>
+        </>
     );
 }
 
