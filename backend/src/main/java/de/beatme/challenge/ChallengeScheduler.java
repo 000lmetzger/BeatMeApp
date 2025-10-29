@@ -6,6 +6,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import de.beatme.firebase.FirebaseConfig;
 import de.beatme.logging.LogController;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -64,5 +66,11 @@ public class ChallengeScheduler {
                     "Assigned random challenge %s to group %s", newChallengeId, groupDoc.getId()
             ));
         }
+    }
+
+    // Einmaliger Trigger beim Backend-Start
+    @EventListener(ApplicationReadyEvent.class)
+    public void triggerOnStartup() throws Exception {
+        assignDailyChallenges();
     }
 }
