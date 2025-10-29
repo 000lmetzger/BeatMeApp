@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
+import InstallPWA from "@/components/InstallPWA.jsx";
 import * as React from "react";
 
 export function LoginForm({ className, ...props }) {
@@ -242,6 +243,7 @@ export function LoginForm({ className, ...props }) {
                     </CardContent>
                 </Card>
             </div>
+            <InstallPWA/>
         </div>
     );
 }

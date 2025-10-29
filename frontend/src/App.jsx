@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import routes from "./routes/routes.jsx";
 import { UserProvider } from "./context/UserContext";
 import { GroupProvider } from "./context/GroupContext.jsx";
+import InstallPWA from "@/components/InstallPWA.jsx";
 
 function App() {
     return (
