@@ -74,7 +74,10 @@ function Home() {
                 <Button
                     variant="default"
                     size="icon"
-                    className="fixed bottom-6 right-6 h-14 w-14 md:h-16 md:w-16 rounded-full !bg-primary/80 !text-primary-foreground !shadow-lg hover:!bg-primary hover:!shadow-xl active:!shadow-md hover:!-translate-y-0.5 active:!translate-y-0 !transition-all focus-visible:!outline-none focus-visible:!ring-2 focus-visible:!ring-offset-2 focus-visible:!ring-primary !border-0"
+                    className="fixed bottom-6 right-6 h-14 w-14 md:h-16 md:w-16 rounded-full !bg-transparent text-white
+             bg-gradient-to-br from-[#5b21b6] via-[#7c3aed] to-[#a855f7]
+             shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#7c3aed] border-0"
                     onClick={handleClick}
                     aria-label="Gruppe hinzufügen"
                 >

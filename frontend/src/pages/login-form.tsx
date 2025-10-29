@@ -193,9 +193,10 @@ export function LoginForm({ className, ...props }) {
                                     <Button
                                         type="submit"
                                         className={cn(
-                                            "w-full transition-all duration-300",
-                                            "hover:scale-[1.02] active:scale-[0.98]",
-                                            "bg-primary hover:bg-primary/90",
+                                            "w-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]",
+                                            "text-white bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7]",
+                                            "hover:from-[#6d28d9] hover:via-[#8b5cf6] hover:to-[#c084fc]",
+                                            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#7c3aed]",
                                             loading && "opacity-50 cursor-not-allowed"
                                         )}
                                         disabled={loading}

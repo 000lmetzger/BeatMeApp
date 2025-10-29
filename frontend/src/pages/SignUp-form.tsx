@@ -107,7 +107,8 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<"div">)
     }
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className={cn(
+            "flex flex-col gap-6 max-w-md mx-auto px-4 mt-12 mb-16", className)} {...props}>
             <h1>Beat Me</h1>
             <Card>
                 <CardHeader>
@@ -164,7 +165,16 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<"div">)
                             </div>
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             <div className="flex flex-col gap-3">
-                                <Button type="submit" className="w-full" disabled={loading}>
+                                <Button
+                                    type="submit"
+                                    className={cn(
+                                        "w-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]",
+                                        "text-white bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7]",
+                                        "hover:from-[#6d28d9] hover:via-[#8b5cf6] hover:to-[#c084fc]",
+                                        "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#7c3aed]"
+                                    )}
+                                    disabled={loading}
+                                >
                                     {loading ? "Loading..." : "Sign Up"}
                                 </Button>
                             </div>

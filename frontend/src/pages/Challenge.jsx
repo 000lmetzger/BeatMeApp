@@ -186,7 +186,10 @@ export function Challenge() {
     }
 
     return (
-        <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
+        <div
+            className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto
+                       max-h-[90vh] overflow-y-auto" // 👈 scrollbarer Bereich + maximale Höhe
+        >
             {dummyNotice && (
                 <Alert className="mb-6 rounded-2xl border-amber-200 bg-gradient-to-r from-amber-50/90 to-orange-50/90 backdrop-blur-sm shadow-lg">
                     <AlertDescription className="text-amber-800 font-medium">
@@ -195,13 +198,21 @@ export function Challenge() {
                 </Alert>
             )}
 
-            <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl overflow-hidden">
+            <Card
+                className="rounded-2xl shadow-2xl shadow-black/10 border-0
+                           bg-gradient-to-br from-white/95 to-white/80
+                           backdrop-blur-xl overflow-hidden
+                           overflow-y-auto max-h-[85vh]" // 👈 Card selbst scrollbar
+            >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 pointer-events-none" />
 
                 <CardHeader className="relative pb-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full" />
-                        <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium bg-blue-100/80 text-blue-700">
+                        <Badge
+                            variant="secondary"
+                            className="rounded-full px-3 py-1 text-xs font-medium bg-blue-100/80 text-blue-700"
+                        >
                             Challenge
                         </Badge>
                     </div>
