@@ -1,6 +1,6 @@
 import { useGroup } from "../context/GroupContext.jsx";
 
-function VotingCard({ user }) {
+function VotingCard({ user, onClick }) {
     const { group } = useGroup();
 
     const uidToUsername = (uid) => {
@@ -16,7 +16,10 @@ function VotingCard({ user }) {
     };
 
     return (
-        <div className="rounded-2xl p-[2px] bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7] shadow-lg">
+        <div
+            className="rounded-2xl p-[2px] bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7] shadow-lg"
+            onClick={onClick}
+        >
             <div className="w-full rounded-[14px] overflow-hidden bg-white/90 backdrop-blur-xl border border-white/40">
                 <div className="px-3 py-2 font-semibold text-gray-900 flex items-center justify-between">
                     <span>{uidToUsername(user.uid)}</span>
@@ -32,6 +35,11 @@ function VotingCard({ user }) {
                             controls
                             muted
                             playsInline
+                            autoPlay
+                            onClick={(e) => {
+                                e.stopPropagation(); // verhindert doppelte Events
+                                if (onClick) onClick(); // Klick weiterleiten
+                            }}
                         />
                     ) : (
                         <img
