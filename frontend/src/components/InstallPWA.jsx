@@ -33,7 +33,7 @@ export default function InstallPWA() {
       onClick={handleInstall}
       className="fixed bottom-6 right-6 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700 transition"
     >
-      📱 App installieren
+      📱 App installieren!
     </button>
   );
 }
