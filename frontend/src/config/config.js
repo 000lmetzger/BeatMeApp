@@ -1,4 +1,1 @@
-export const API_URL =
-    import.meta.env.MODE === "development"
-        ? "http://localhost:8080"
-        : "https://beatmeapp.onrender.com";
+export const API_URL = "https://beatmeapp.onrender.com";
