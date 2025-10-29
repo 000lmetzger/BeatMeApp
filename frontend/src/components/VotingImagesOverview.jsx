@@ -20,6 +20,12 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
         return member ? member.username : "No username";
     };
 
+    const isVideoFile = (url) => {
+        if (!url) return false;
+        const videoExtensions = [".mp4", ".mov", ".webm", ".ogg"];
+        return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    };
+
     const changeOrderOfImages = (v) => [...v].sort((a, b) => b.points - a.points);
 
     const updatePointsFromVotes = (images, votes) => {
@@ -63,7 +69,6 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
 
     return (
         <div className="flex-1 overflow-y-auto min-h-0 w-full p-4 pb-24">
-            {/* Grid */}
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 {localImageData.length > 0 ? (
                     changeOrderOfImages(localImageData).map((item, index) => (
@@ -82,7 +87,6 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                 )}
             </div>
 
-            {/* Modal */}
             {isModalOpen && selectedUser && (
                 <div className="fixed inset-0 z-50">
                     <div
@@ -104,11 +108,19 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                                     {uidToUsername(selectedUser.uid)}
                                 </h2>
 
-                                <img
-                                    src={selectedUser.url}
-                                    alt={uidToUsername(selectedUser.uid)}
-                                    className="mt-4 rounded-xl w-full object-cover"
-                                />
+                                {isVideoFile(selectedUser.url) ? (
+                                    <video
+                                        src={selectedUser.url}
+                                        controls
+                                        className="mt-4 rounded-xl w-full object-cover"
+                                    />
+                                ) : (
+                                    <img
+                                        src={selectedUser.url}
+                                        alt={uidToUsername(selectedUser.uid)}
+                                        className="mt-4 rounded-xl w-full object-cover"
+                                    />
+                                )}
 
                                 <div className="mt-5 mb-2">
                                     {selectedUser.points > 0 ? (
@@ -118,7 +130,7 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                                         </p>
                                     ) : (
                                         <>
-                                            <p className="text-center text-gray-700">Vote for this image:</p>
+                                            <p className="text-center text-gray-700">Vote for this media:</p>
                                             <div className="mt-3 grid grid-cols-3 gap-3">
                                                 {availablePoints.includes(3) && (
                                                     <button
