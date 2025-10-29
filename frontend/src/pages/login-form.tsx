@@ -72,13 +72,13 @@ export function LoginForm({ className, ...props }) {
                 groups
             });
 
-            console.log("Login erfolgreich:", firebaseUser.email);
+            console.log("Login successful:", firebaseUser.email);
             navigate("/home");
         } catch (err) {
             const firebaseErrorMessage = err.code
                 ? `Login failed: ${err.code.split("/")[1]}`
                 : "An unexpected error occurred.";
-            console.error("Firebase Login Fehler:", err);
+            console.error("Firebase Login Error:", err);
             setError(firebaseErrorMessage);
         } finally {
             setLoading(false);

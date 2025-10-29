@@ -57,7 +57,7 @@ function Voting() {
 
     async function vote(cid, userId, votedFor, position) {
         if (!token) {
-            console.error("Kein Token gefunden, Vote nicht möglich.");
+            console.error("No token found.");
             return;
         }
 
@@ -74,23 +74,23 @@ function Voting() {
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                console.error("Vote fehlgeschlagen:", errData.error || response.statusText);
+                console.error("An error ocurred during voting:", errData.error || response.statusText);
                 return;
             }
 
             const data = await response.json();
-            console.log("Vote erfolgreich:", data);
+            console.log("Vote successful:", data);
 
             // SWR revalidate votesData nach erfolgreichem Vote
             if (votesUrl) {
                 fetcher(votesUrl).then(updated => {
-                    console.log("VotesData aktualisiert:", updated);
+                    console.log("VotesData updated:", updated);
                 });
             }
 
             return data;
         } catch (err) {
-            console.error("Fehler beim Voten:", err);
+            console.error("Error during voting:", err);
         }
     }
 

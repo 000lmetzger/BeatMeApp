@@ -30,6 +30,20 @@ const fetcher = async (url) => {
     return res.json();
 };
 
+// Hilfsfunktion zur Bestimmung des Dateityps
+const getFileType = (filename) => {
+    if (!filename) return 'unknown';
+
+    const extension = filename.split('.').pop()?.toLowerCase();
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+    const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'wmv', 'flv'];
+
+    if (imageExtensions.includes(extension)) return 'image';
+    if (videoExtensions.includes(extension)) return 'video';
+
+    return 'unknown';
+};
+
 export function Challenge() {
     const { user } = useUser();
     const { group } = useGroup();
@@ -188,7 +202,7 @@ export function Challenge() {
     return (
         <div
             className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto
-                       max-h-[90vh] overflow-y-auto" // 👈 scrollbarer Bereich + maximale Höhe
+                       max-h-[90vh] overflow-y-auto"
         >
             {dummyNotice && (
                 <Alert className="mb-6 rounded-2xl border-amber-200 bg-gradient-to-r from-amber-50/90 to-orange-50/90 backdrop-blur-sm shadow-lg">
@@ -202,7 +216,7 @@ export function Challenge() {
                 className="rounded-2xl shadow-2xl shadow-black/10 border-0
                            bg-gradient-to-br from-white/95 to-white/80
                            backdrop-blur-xl overflow-hidden
-                           overflow-y-auto max-h-[85vh]" // 👈 Card selbst scrollbar
+                           overflow-y-auto max-h-[85vh]"
             >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 pointer-events-none" />
 
@@ -229,7 +243,10 @@ export function Challenge() {
                         <div className="relative">
                             <div className="absolute -inset-4 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-2xl blur-xl" />
                             <div className="relative">
-                                <Submitted image={challengeDone} />
+                                <Submitted
+                                    image={challengeDone}
+                                    fileType={getFileType(challengeDone?.filename || challengeDone?.url)}
+                                />
                             </div>
                         </div>
                     ) : (
