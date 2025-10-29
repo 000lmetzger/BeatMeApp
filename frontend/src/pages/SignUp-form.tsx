@@ -65,7 +65,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<"div">)
             }
 
             const responseData = await res.json()
-            console.log("Registrierung erfolgreich:", responseData)
+            console.log("Registration successful:", responseData)
 
             const loginResult = await signInWithEmailAndPassword(auth, email, password)
             const firebaseUser = loginResult.user
@@ -99,7 +99,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<"div">)
 
             navigate("/home")
         } catch (err: any) {
-            console.error("Registrierungsfehler:", err)
+            console.error("Registration error:", err)
             setError(err.message || "An unexpected error occurred.")
         } finally {
             setLoading(false)
