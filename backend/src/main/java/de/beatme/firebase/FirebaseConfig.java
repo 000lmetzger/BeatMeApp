@@ -10,6 +10,9 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+
 @Configuration(proxyBeanMethods = false)
 @Log
 public class FirebaseConfig {
@@ -19,10 +22,12 @@ public class FirebaseConfig {
     @PostConstruct
     public void init() {
         try {
-            ClassPathResource serviceAccount = new ClassPathResource("firebase-key.json");
+            String firebaseJson = System.getenv("FIREBASE_ACCOUNT");
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
+                    .setCredentials(GoogleCredentials.fromStream(
+                            new ByteArrayInputStream(firebaseJson.getBytes(StandardCharsets.UTF_8))
+                    ))
                     .setStorageBucket("beatme-1609.firebasestorage.app")
                     .build();
 
