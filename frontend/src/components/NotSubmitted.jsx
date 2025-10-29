@@ -47,7 +47,7 @@ export default function NotSubmitted({
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         capture="environment"
         onChange={handleFileChange}
         style={{ display: 'none' }}
@@ -55,7 +55,7 @@ export default function NotSubmitted({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />

@@ -207,6 +207,10 @@ public class GroupService {
     }
 
     public String submitChallenge(String groupId, String challengeId, String uid, MultipartFile file) throws Exception {
+        System.out.println("📦 Datei empfangen: " + file.getOriginalFilename());
+        System.out.println("📏 Größe: " + file.getSize() + " Bytes (" + file.getSize() / (1024 * 1024) + " MB)");
+        System.out.println("📁 Typ: " + file.getContentType());
+
         Bucket bucket = StorageClient.getInstance().bucket();
 
         String contentType = file.getContentType();
@@ -233,6 +237,7 @@ public class GroupService {
 
         return fileUrl;
     }
+
 
     public Map<String, Object> getSubmissionsOfPreviousChallenge(String groupId, String uid) throws Exception {
         Firestore db = FirebaseConfig.db;
@@ -297,9 +302,8 @@ public class GroupService {
         }
 
         Object rawVotes = groupDoc.get("votes." + challengeId + "." + uid);
-
         if (!(rawVotes instanceof Map<?, ?> userVotes)) {
-            return new HashMap<>();
+            throw new RuntimeException("No votes found for this user in this challenge");
         }
 
         String first = (String) userVotes.get("first");
