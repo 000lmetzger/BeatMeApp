@@ -22,7 +22,7 @@ public class FirebaseConfig {
     @PostConstruct
     public void init() {
         try {
-            String firebaseJson = System.getenv("FIREBASE_SERVICE_ACCOUNT");
+            String firebaseJson = System.getenv("FIREBASE_ACCOUNT");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(
