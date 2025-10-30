@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 export default function NotSubmitted({
   error,
@@ -13,109 +13,69 @@ export default function NotSubmitted({
   loading,
   isMobile
 }) {
-  const [isRecording, setIsRecording] = useState(false);
-  const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const recordedChunksRef = useRef([]);
+  const photoInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-        audio: true
-      });
+  const openPhotoCamera = () => {
+    const tempInput = document.createElement('input');
+    tempInput.type = 'file';
+    tempInput.accept = 'image/*';
+    tempInput.capture = 'environment';
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
+    tempInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) handleFileChange({ target: { files: [file] } });
+    };
 
-      // Setup media recorder
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      recordedChunksRef.current = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: 'video/mp4' });
-        const file = new File([blob], `camera-video-${Date.now()}.mp4`, { type: 'video/mp4' });
-        handleFileChange({ target: { files: [file] } });
-
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-    } catch (err) {
-      console.error('Error accessing camera:', err);
-      // Fallback zu normalem File Input
-      cameraInputRef.current?.click();
-    }
+    tempInput.click();
   };
 
-  const startRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    }
-  };
+  const openVideoCamera = () => {
+    const tempInput = document.createElement('input');
+    tempInput.type = 'file';
+    tempInput.accept = 'video/*';
+    tempInput.capture = 'environment';
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
+    tempInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) handleFileChange({ target: { files: [file] } });
+    };
 
-  const takePhoto = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0);
-
-      canvas.toBlob((blob) => {
-        const file = new File([blob], `camera-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
-        handleFileChange({ target: { files: [file] } });
-      }, 'image/jpeg');
-    }
+    tempInput.click();
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-      {/* Vereinfachte Version für normale Nutzung */}
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
         {isMobile && (
-          <button
-            onClick={() => {
-              // Direkter Kamera-Zugriff versuchen
-              const tempInput = document.createElement('input');
-              tempInput.type = 'file';
-              tempInput.accept = 'image/*,video/*';
-              tempInput.capture = 'environment';
-
-              tempInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) handleFileChange({ target: { files: [file] } });
-              };
-
-              tempInput.click();
-            }}
-            style={buttonStyle}
-            disabled={loading}
-          >
-            📸 Open Camera Directly
-          </button>
+          <>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={openPhotoCamera}
+                style={buttonStyle}
+                disabled={loading}
+              >
+                📸 Take Photo
+              </button>
+              <button
+                onClick={openVideoCamera}
+                style={buttonStyle}
+                disabled={loading}
+              >
+                🎥 Record Video
+              </button>
+            </div>
+            <div style={{ textAlign: 'center', fontSize: '12px', color: '#666' }}>
+              This will open your camera directly
+            </div>
+          </>
         )}
         <button
           onClick={openFileBrowser}
           style={outlineButtonStyle}
           disabled={loading}
         >
-          📂 Select from Storage
+          📂 Select from Gallery
         </button>
       </div>
 
@@ -129,10 +89,19 @@ export default function NotSubmitted({
         </div>
       )}
 
+      {/* Versteckte Inputs für Fallback */}
       <input
-        ref={cameraInputRef}
+        ref={photoInputRef}
         type="file"
-        accept="image/*,video/*"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+      <input
+        ref={videoInputRef}
+        type="file"
+        accept="video/*"
         capture="environment"
         onChange={handleFileChange}
         style={{ display: 'none' }}
