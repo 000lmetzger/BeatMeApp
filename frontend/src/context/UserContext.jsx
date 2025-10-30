@@ -37,7 +37,7 @@ export const UserProvider = ({ children }) => {
                         });
                     }
                 } catch (err) {
-                    console.error("Fehler beim Laden der User-Daten:", err);
+                    console.error("An error occurred loading User-Data:", err);
                     setUser({
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,

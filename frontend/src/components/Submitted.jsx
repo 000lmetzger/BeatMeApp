@@ -1,21 +1,14 @@
 function Submitted({ image, fileType }) {
-    // Debug: Logge den gesamten image object
-    console.log("Submitted image object:", image);
-    console.log("FileType prop:", fileType);
 
-    // Erweiterte Dateityp-Erkennung
     const determineFileType = () => {
-        // Wenn fileType explizit übergeben wurde, verwende das
         if (fileType && fileType !== 'unknown') return fileType;
 
-        // Prüfe verschiedene mögliche URL-Felder
         const url = image?.url || image?.fileUrl || image?.filename || image?.imageUrl || image?.submissionUrl || '';
         console.log("Detected URL:", url);
 
         if (!url) return 'unknown';
 
-        // Extrahiere Dateiendung aus URL
-        const urlWithoutParams = url.split('?')[0]; // Entferne Query-Parameter
+        const urlWithoutParams = url.split('?')[0];
         const extension = urlWithoutParams.split('.').pop()?.toLowerCase();
         console.log("Detected extension:", extension);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import VotingCard from "./VotingCard.jsx";
 import { useGroup } from "../context/GroupContext.jsx";
 import { useUser } from "../context/UserContext.jsx";
@@ -9,6 +9,7 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
     const { group } = useGroup();
     const { user } = useUser();
     const [localImageData, setLocalImageData] = useState([]);
+    const videoRef = useRef(null); // Ref für Video im Modal
 
     const handleCardClick = (user) => {
         setSelectedUser(user);
@@ -19,6 +20,14 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
         const member = group.members.find((m) => m.uid === uid);
         return member ? member.username : "No username";
     };
+
+    const isVideoFile = (url) => {
+        if (!url) return false;
+        const cleanUrl = url.split('?')[0].toLowerCase();
+        const videoExtensions = [".mp4", ".mov", ".webm", ".ogg"];
+        return videoExtensions.some(ext => cleanUrl.endsWith(ext));
+    };
+
 
     const changeOrderOfImages = (v) => [...v].sort((a, b) => b.points - a.points);
 
@@ -61,28 +70,31 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
         setIsModalOpen(false);
     };
 
+    // Autoplay Video sobald Modal geöffnet wird
+    useEffect(() => {
+        if (isModalOpen && videoRef.current) {
+            videoRef.current.play().catch((err) => {
+                console.warn("Video konnte nicht automatisch gestartet werden:", err);
+            });
+        }
+    }, [isModalOpen, selectedUser]);
+
     return (
         <div className="flex-1 overflow-y-auto min-h-0 w-full p-4 pb-24">
-            {/* Grid */}
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 {localImageData.length > 0 ? (
                     changeOrderOfImages(localImageData).map((item, index) => (
-                        <div
+                        <VotingCard
                             key={item.id ?? index}
+                            user={item}
                             onClick={() => handleCardClick(item)}
-                            className="rounded-2xl p-[2px] bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7] hover:shadow-xl transition-shadow"
-                        >
-                            <div className="rounded-[14px] overflow-hidden bg-white">
-                                <VotingCard user={item} />
-                            </div>
-                        </div>
+                        />
                     ))
                 ) : (
                     <p className="col-span-2 text-center text-gray-500">No images provided</p>
                 )}
             </div>
 
-            {/* Modal */}
             {isModalOpen && selectedUser && (
                 <div className="fixed inset-0 z-50">
                     <div
@@ -104,11 +116,23 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                                     {uidToUsername(selectedUser.uid)}
                                 </h2>
 
-                                <img
-                                    src={selectedUser.url}
-                                    alt={uidToUsername(selectedUser.uid)}
-                                    className="mt-4 rounded-xl w-full object-cover"
-                                />
+                                {isVideoFile(selectedUser.url) ? (
+                                    <video
+                                        ref={videoRef}
+                                        src={selectedUser.url}
+                                        controls
+                                        muted
+                                        autoPlay
+                                        playsInline
+                                        className="mt-4 rounded-xl w-full object-cover"
+                                    />
+                                ) : (
+                                    <img
+                                        src={selectedUser.url}
+                                        alt={uidToUsername(selectedUser.uid)}
+                                        className="mt-4 rounded-xl w-full object-cover"
+                                    />
+                                )}
 
                                 <div className="mt-5 mb-2">
                                     {selectedUser.points > 0 ? (
@@ -118,7 +142,7 @@ function VotingImagesOverview({ imageData, yesterdayChallenge, vote, votesData }
                                         </p>
                                     ) : (
                                         <>
-                                            <p className="text-center text-gray-700">Vote for this image:</p>
+                                            <p className="text-center text-gray-700">Vote for this media:</p>
                                             <div className="mt-3 grid grid-cols-3 gap-3">
                                                 {availablePoints.includes(3) && (
                                                     <button

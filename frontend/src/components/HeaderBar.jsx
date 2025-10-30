@@ -19,7 +19,7 @@ function HeaderBar({ enable_back }) {
             }
             navigate("/login");
         } catch (error) {
-            console.error("Fehler beim Logout:", error);
+            console.error("Error during Logout:", error);
         }
     }
 

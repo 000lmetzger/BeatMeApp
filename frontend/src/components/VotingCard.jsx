@@ -1,6 +1,6 @@
 import { useGroup } from "../context/GroupContext.jsx";
 
-function VotingCard({ user }) {
+function VotingCard({ user, onClick }) {
     const { group } = useGroup();
 
     const uidToUsername = (uid) => {
@@ -8,21 +8,48 @@ function VotingCard({ user }) {
         return member ? member.username : "No username";
     };
 
+    const isVideoFile = (url) => {
+        if (!url) return false;
+        const cleanUrl = url.split('?')[0];
+        const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'wmv', 'flv'];
+        return videoExtensions.some(ext => cleanUrl.toLowerCase().endsWith('.' + ext));
+    };
+
     return (
-        <div className="rounded-2xl p-[2px] bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7] shadow-lg">
+        <div
+            className="rounded-2xl p-[2px] bg-gradient-to-r from-[#5b21b6] via-[#7c3aed] to-[#a855f7] shadow-lg"
+            onClick={onClick}
+        >
             <div className="w-full rounded-[14px] overflow-hidden bg-white/90 backdrop-blur-xl border border-white/40">
                 <div className="px-3 py-2 font-semibold text-gray-900 flex items-center justify-between">
                     <span>{uidToUsername(user.uid)}</span>
                 </div>
 
                 <div className="w-full h-48 relative flex justify-center items-center bg-gray-100">
-                    <img
-                        src={user.url}
-                        alt="No image provided"
-                        className={`w-full h-full object-cover transition-opacity ${
-                            user.points === 0 ? "opacity-100" : "opacity-40"
-                        }`}
-                    />
+                    {isVideoFile(user.url) ? (
+                        <video
+                            src={user.url}
+                            className={`w-full h-full object-cover transition-opacity ${
+                                user.points === 0 ? "opacity-100" : "opacity-40"
+                            }`}
+                            controls
+                            muted
+                            playsInline
+                            autoPlay
+                            onClick={(e) => {
+                                e.stopPropagation(); // verhindert doppelte Events
+                                if (onClick) onClick(); // Klick weiterleiten
+                            }}
+                        />
+                    ) : (
+                        <img
+                            src={user.url}
+                            alt="No image provided"
+                            className={`w-full h-full object-cover transition-opacity ${
+                                user.points === 0 ? "opacity-100" : "opacity-40"
+                            }`}
+                        />
+                    )}
 
                     {user.points !== 0 && (
                         <div className="absolute inset-0 flex items-center justify-center">
