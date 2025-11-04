@@ -6,10 +6,9 @@ export default function InstallPWA() {
 
   useEffect(() => {
     const handler = (e) => {
-      // Standardbanner verhindern
       e.preventDefault();
       setDeferredPrompt(e);
-      setVisible(true); // unseren Button zeigen
+      setVisible(true);
     };
 
     window.addEventListener("beforeinstallprompt", handler);

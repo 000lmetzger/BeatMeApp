@@ -3,7 +3,6 @@ import { useGroup } from "../context/GroupContext.jsx";
 import { API_URL } from "../config/config.js";
 import useSWR from "swr";
 
-// shadcn/ui
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
