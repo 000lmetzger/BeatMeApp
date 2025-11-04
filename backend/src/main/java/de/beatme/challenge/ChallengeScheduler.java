@@ -67,10 +67,4 @@ public class ChallengeScheduler {
             ));
         }
     }
-
-    // Einmaliger Trigger beim Backend-Start
-    @EventListener(ApplicationReadyEvent.class)
-    public void triggerOnStartup() throws Exception {
-        assignDailyChallenges();
-    }
 }
