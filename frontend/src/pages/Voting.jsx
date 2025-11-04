@@ -3,7 +3,6 @@ import useSWR from "swr";
 import { API_URL } from "../config/config.js";
 import { useGroup } from "../context/GroupContext.jsx";
 
-// shadcn/ui
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +35,7 @@ function Voting() {
     const { group } = useGroup();
     const token = localStorage.getItem("firebaseToken");
 
-    // Submissions des gestrigen Challenges
+    // Submissions
     const submissionsUrl =
         group?.groupId && token
             ? `${API_URL}/groups/${group.groupId}/challenges/previous/submissions`

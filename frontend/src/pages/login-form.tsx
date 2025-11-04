@@ -27,7 +27,7 @@ export function LoginForm({ className, ...props }) {
     const [error, setError] = useState(null);
     const [isMounted, setIsMounted] = useState(false);
 
-    // Animation beim Mounten
+
     useEffect(() => {
         setIsMounted(true);
     }, []);

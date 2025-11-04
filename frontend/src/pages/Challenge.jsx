@@ -126,7 +126,6 @@ export function Challenge() {
         }
     };
 
-    // Premium button styles with modern animations
     const buttonStyle = {
         padding: "14px 24px",
         border: "none",
@@ -154,7 +153,6 @@ export function Challenge() {
         boxShadow: "0 8px 32px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.2)",
     };
 
-    // Premium loading state
     if (challengeLoading || submissionLoading) {
         return (
             <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
