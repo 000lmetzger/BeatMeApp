@@ -74,7 +74,7 @@ function Voting() {
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                console.error("An error ocurred during voting:", errData.error || response.statusText);
+                console.error("An error occurred during voting:", errData.error || response.statusText);
                 return;
             }
 
@@ -98,11 +98,11 @@ function Voting() {
     if (isLoading) {
         return (
             <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
-                <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl">
+                <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 dark:from-gray-900/80 dark:to-gray-800/90 backdrop-blur-xl">
                     <CardHeader className="pb-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-2 h-8 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full" />
-                            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:bg-none dark:text-white">
                                 Voting
                             </CardTitle>
                         </div>
@@ -127,8 +127,8 @@ function Voting() {
     if (!token) {
         return (
             <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
-                <Alert className="rounded-2xl border-amber-200 bg-amber-50/80 backdrop-blur-sm">
-                    <AlertDescription className="text-amber-800 font-medium">
+                <Alert className="rounded-2xl border-amber-200 bg-amber-50/80 dark:bg-amber-900/30 backdrop-blur-sm">
+                    <AlertDescription className="text-amber-800 dark:text-amber-100 font-medium">
                         Bitte einloggen, um Voting zu sehen.
                     </AlertDescription>
                 </Alert>
@@ -139,8 +139,8 @@ function Voting() {
     if (error) {
         return (
             <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
-                <Alert className="rounded-2xl border-red-200 bg-red-50/80 backdrop-blur-sm">
-                    <AlertDescription className="text-red-800 font-medium">
+                <Alert className="rounded-2xl border-red-200 bg-red-50/80 dark:bg-red-900/30 backdrop-blur-sm">
+                    <AlertDescription className="text-red-800 dark:text-red-100 font-medium">
                         Fehler beim Laden der Submissions: {error.message}
                     </AlertDescription>
                 </Alert>
@@ -150,17 +150,17 @@ function Voting() {
 
     return (
         <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
-            <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-transparent to-pink-50/20 pointer-events-none" />
+            <Card className="rounded-2xl shadow-2xl shadow-black/10 border-0 bg-gradient-to-br from-white/95 to-white/80 dark:from-gray-900/80 dark:to-gray-800/90 backdrop-blur-xl overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-transparent to-pink-50/20 dark:from-purple-900/10 dark:to-pink-900/10 pointer-events-none" />
 
                 <CardHeader className="relative pb-6">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-2 h-8 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full" />
-                        <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium bg-purple-100/80 text-purple-700">
+                        <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium bg-purple-100/80 text-purple-700 dark:bg-purple-900/40 dark:text-purple-200">
                             Vote Now
                         </Badge>
                     </div>
-                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
+                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:bg-none dark:text-white leading-tight">
                         Voting
                     </CardTitle>
                 </CardHeader>
@@ -169,11 +169,11 @@ function Voting() {
                     {yesterdayChallenge && (
                         <div className="relative">
                             <div className="absolute -inset-4 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-2xl blur-xl" />
-                            <div className="relative bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                            <div className="relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-white/20 dark:border-gray-700/30">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                                     {yesterdayChallenge.challenge}
                                 </h2>
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                                     {yesterdayChallenge.description}
                                 </p>
                             </div>
