@@ -1,9 +1,12 @@
 import React from "react";
 import BackwardsButton from "./BackwardsButton.jsx";
 import { useGroup } from "../context/GroupContext.jsx";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function HeaderBarGroup({ onBack }) {
     const { group } = useGroup();
+
+    console.log(group.groupPicture)
 
     return (
         <header
@@ -28,11 +31,14 @@ export default function HeaderBarGroup({ onBack }) {
             </div>
 
             <div className="flex justify-end">
-                <img
-                    src={group?.groupPicture}
-                    alt="Group"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-white/70 ring-2 ring-white/20"
-                />
+                <Avatar className="w-10 h-10">
+                    <AvatarImage
+                        src={group?.groupPicture}
+                        alt="Group"
+                        className="object-cover"
+                    />
+                    <AvatarFallback>GR</AvatarFallback>
+                </Avatar>
             </div>
         </header>
     );
