@@ -55,6 +55,12 @@ function DisplaySingleGroupInUserHome({ group_information }) {
         fetcher
     );
 
+    const { data: challenge } = useSWR(
+        group_information?.groupId ? `${API_URL}/challenges/group/${group_information.groupId}/current` : null,
+        fetcher
+    );
+
+
     const yid = yesterdayData?.challenge?.challengeId;
     const { data: votesData } = useSWR(
         yid ? `${API_URL}/groups/${group_information.groupId}/challenges/${yid}/votes` : null,
@@ -130,9 +136,9 @@ function DisplaySingleGroupInUserHome({ group_information }) {
                 </div>
 
                 <div className="text-base mt-3">
-                    <b>{yesterdayData?.challenge?.challenge || "No challenge found"}</b>
+                    <b>{challenge?.challenge ||  "No challenge found"}</b>
                     <br />
-                    {yesterdayData?.challenge?.description || ""}
+                    {challenge?.description || "No description found."}
                 </div>
             </CardContent>
         </Card>
