@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -29,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     /**
@@ -46,7 +44,8 @@ public class SecurityConfig {
 
             String path = request.getRequestURI();
 
-            if (path.startsWith("/users")) {
+            // Endpoints, die KEIN Firebase-Token brauchen
+            if (path.startsWith("/users") || path.equals("/challenges/new_day")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -73,30 +72,31 @@ public class SecurityConfig {
 
             } catch (FirebaseAuthException e) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
-                return; // ← WICHTIG
+                return;
             }
         }
     }
 
-    //Security-Konfiguration
+    // Security-Konfiguration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // erlaubte Endpoints ohne Firebase-Token
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/challenges/new_day").permitAll()
                         // alles andere nur mit Token
                         .anyRequest().authenticated()
-
                 )
-                //Firebase-Filter kommt vor Username/Password
+                // Firebase-Filter kommt vor Username/Password-Filter
                 .addFilterBefore(new FirebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    //CORS-Config für Frontend
+    // CORS-Config für Frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

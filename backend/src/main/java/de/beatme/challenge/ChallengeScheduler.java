@@ -19,7 +19,6 @@ import java.util.*;
 @EnableScheduling
 public class ChallengeScheduler {
 
-    @Scheduled(cron = "0 0 0 * * *") // jeden Tag um 00:00 Uhr
     public void assignDailyChallenges() throws Exception {
 
         Firestore db = FirebaseConfig.db;
