@@ -138,7 +138,7 @@ function DisplaySingleGroupInUserHome({ group_information }) {
                 <div className="text-base mt-3">
                     <b>{challenge?.challenge ||  "No challenge found"}</b>
                     <br />
-                    {challenge?.description || "No description found."}
+                    {challenge?.description || "No description found"}
                 </div>
             </CardContent>
         </Card>
