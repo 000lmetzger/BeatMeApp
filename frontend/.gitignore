@@ -28,4 +28,4 @@ dev-dist
 certs/
 
 #API Keys für Firebase
-src/config/firebase.js
+.env
