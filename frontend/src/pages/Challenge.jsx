@@ -232,7 +232,7 @@ export function Challenge() {
                         {challenge?.challenge || ""}
                     </CardTitle>
                     <CardDescription className="text-lg text-gray-600 leading-relaxed mt-3">
-                        {challenge?.description || ""}
+e                        {challenge?.description || ""}
                     </CardDescription>
                 </CardHeader>
 
