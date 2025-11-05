@@ -9,6 +9,9 @@ ____             _   __  __
 |____/ \___|\__,_|\__|_|  |_|\___|
 </pre>
 
+<img width="1024" height="1024" alt="icon-192" src="https://github.com/user-attachments/assets/9df1eeb8-6965-46ec-ae76-377a045e5e2b" />
+
+
 <br>
 
 [![npm version](https://img.shields.io/badge/npm-v11.6.0-blue)]()
