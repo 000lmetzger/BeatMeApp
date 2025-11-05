@@ -1,13 +1,4 @@
-<p align="center">
 
-<pre>
-____             _   __  __      
-|  _ \           | | |  \/  |     
-| |_) | ___  __ _| |_| \  / | ___
-|  _ < / _ \/ _` | __| |\/| |/ _ \
-| |_) |  __/ (_| | |_| |  | |  __/
-|____/ \___|\__,_|\__|_|  |_|\___|
-</pre>
 
 <img width="300" height="300" alt="icon-192" src="https://github.com/user-attachments/assets/9df1eeb8-6965-46ec-ae76-377a045e5e2b" />
 
