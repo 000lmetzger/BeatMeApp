@@ -11,7 +11,7 @@ ____             _   __  __
 
 <br>
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.0-blue)]()
+[![npm version](https://img.shields.io/badge/npm-v11.6.0-blue)]()
 [![build](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
