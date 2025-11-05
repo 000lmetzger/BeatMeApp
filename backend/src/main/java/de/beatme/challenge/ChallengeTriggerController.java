@@ -1,6 +1,5 @@
 package de.beatme.challenge;
 
-import de.beatme.logging.LogController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +24,20 @@ public class ChallengeTriggerController {
     ) {
         try {
             if (expectedApiKey == null || !expectedApiKey.equals(apiKey)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Unauthorized: Invalid or missing API key");
             }
 
             challengeScheduler.assignDailyChallenges();
-            return ResponseEntity.ok("New day triggered successfully: daily challenges have been assigned to all groups!\n");
+
+            return ResponseEntity.ok(
+                    "✅ New day triggered successfully: daily challenges have been assigned to all groups!"
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error assigning challenges");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("❌ Error assigning challenges: " + e.getMessage());
         }
     }
 }
