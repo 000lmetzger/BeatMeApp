@@ -27,9 +27,8 @@ Create or join groups, take on daily challenges, and climb the leaderboard — a
 
 ### ✨ Features
 - 🏆 **Daily Challenges** — Compete in fun or fitness-based tasks.  
-- 👥 **Group System** — Create private or public groups with friends.  
+- 👥 **Group System** — Create groups with friends.  
 - 📊 **Progress Tracking** — View stats and history to stay motivated.  
-- 🔔 **Notifications** — Get reminded when new challenges drop.  
 - ⚡ **PWA Ready** — Works seamlessly across all devices.
 
 ---
