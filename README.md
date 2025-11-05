@@ -11,6 +11,6 @@ ____             _   __  __
 
 <br>
 
-![Version](https://img.shields.io/badge/Version-1.0.0-green) ![npm version](https://img.shields.io/badge/npm-v1.0.0-blue)
+![Version](https://img.shields.io/badge/Version-1.0.0-green) ![npm version](https://img.shields.io/badge/npm-v11.6.0-blue)
 
 </p>
