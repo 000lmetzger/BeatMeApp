@@ -29,7 +29,7 @@ public class ChallengeTriggerController {
             }
 
             challengeScheduler.assignDailyChallenges();
-            return ResponseEntity.ok("New day triggered successfully: daily challenges have been assigned to all groups.\n");
+            return ResponseEntity.ok("New day triggered successfully: daily challenges have been assigned to all groups!\n");
 
         } catch (Exception e) {
             e.printStackTrace();
