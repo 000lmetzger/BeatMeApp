@@ -11,7 +11,7 @@ public class ChallengeTriggerController {
 
     private final ChallengeScheduler challengeScheduler;
 
-    @Value("${api.key.trigger_new_day}")
+    @Value("${API_KEY_TRIGGER_NEW_DAY}")
     private String expectedApiKey;
 
     public ChallengeTriggerController(ChallengeScheduler challengeScheduler) {
