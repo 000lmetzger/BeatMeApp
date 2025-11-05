@@ -35,8 +35,6 @@ Create or join groups, take on daily challenges, and climb the leaderboard — a
 
 ---
 
----
-
 <p align="center">
   Made with ❤️ by the BeatMe team
 </p>
