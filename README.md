@@ -1,14 +1,14 @@
-
-
-<img width="300" height="300" alt="icon-192" src="https://github.com/user-attachments/assets/9df1eeb8-6965-46ec-ae76-377a045e5e2b" />
-
+<p align="center">
+  <img width="300" height="300" alt="BeatMe Logo" src="https://github.com/user-attachments/assets/9df1eeb8-6965-46ec-ae76-377a045e5e2b" />
+</p>
 
 <br>
 
-[![npm version](https://img.shields.io/badge/npm-v11.6.0-blue)]()
-[![build](https://img.shields.io/badge/build-passing-brightgreen)]()
-
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/npm-v11.6.0-blue" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/build-passing-brightgreen" /></a>
 </p>
+
 
 ---
 
