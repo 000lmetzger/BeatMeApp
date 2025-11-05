@@ -35,12 +35,6 @@ Create or join groups, take on daily challenges, and climb the leaderboard — a
 
 ---
 
-### 💡 Vision
-BeatMe isn’t just about competition — it’s about **consistency, motivation, and community.**  
-Challenge yourself. Motivate others. Be better than yesterday.
-
----
-
 <p align="center">
   Made with ❤️ by the BeatMe team
 </p>
