@@ -37,7 +37,7 @@ Create or join groups, take on daily challenges, and climb the leaderboard — a
 - **Frontend:** React + Vite  
 - **UI:** Shadcn/UI + TailwindCSS  
 - **Backend:** Firebase (Auth, Firestore, Storage)  
-- **Hosting:** Vercel (PWA optimized)  
+- **Hosting:** Vercel and Render (PWA optimized)  
 
 ---
 
