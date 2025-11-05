@@ -13,7 +13,6 @@ ____             _   __  __
 
 [![npm version](https://img.shields.io/badge/npm-v11.6.0-blue)]()
 [![build](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![license](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 </p>
 
