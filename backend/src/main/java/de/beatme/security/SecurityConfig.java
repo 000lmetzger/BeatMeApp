@@ -106,6 +106,10 @@ public class SecurityConfig {
         config.addAllowedOrigin("https://localhost:5174");
         config.addAllowedOrigin("https://localhost:4173");
 
+        config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://localhost:5174");
+        config.addAllowedOrigin("http://localhost:4173");
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("*"));
