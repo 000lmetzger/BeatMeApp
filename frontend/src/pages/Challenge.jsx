@@ -198,11 +198,8 @@ export function Challenge() {
     }
 
     return (
-        <div
-            className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto
-                       max-h-[90vh] overflow-y-auto"
-        >
-            {dummyNotice && (
+        <div className="px-4 sm:px-6 pb-20 max-w-2xl mx-auto overflow-y-auto">
+        {dummyNotice && (
                 <Alert className="mb-6 rounded-2xl border-amber-200 bg-gradient-to-r from-amber-50/90 to-orange-50/90 backdrop-blur-sm shadow-lg">
                     <AlertDescription className="text-amber-800 font-medium">
                         No challenge found, using dummy data.
