@@ -228,7 +228,7 @@ export function Challenge() {
                             Challenge
                         </Badge>
                     </div>
-                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
+                    <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white leading-tight">
                         {challenge?.challenge || ""}
                     </CardTitle>
                     <CardDescription className="text-lg text-gray-600 leading-relaxed mt-3">
