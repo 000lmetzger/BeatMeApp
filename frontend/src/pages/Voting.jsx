@@ -138,7 +138,7 @@ function Voting() {
     if (error) {
         return (
             <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto">
-                <Alert className="rounded-2xl border-red-200 bg-red-50/80 dark:bg-red-900/30 backdrop-blur-sm">
+                <Alert className="rounded-2xl border-red-200 bg-red-50/80 dark:bg-red-900/30 backdrop-blur-sm mt-50">
                     <AlertDescription className="text-red-800 dark:text-red-100 font-medium">
                         Fehler beim Laden der Submissions: {error.message}
                     </AlertDescription>
