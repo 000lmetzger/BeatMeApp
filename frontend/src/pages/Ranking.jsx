@@ -90,7 +90,7 @@ function Ranking() {
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/30 via-transparent to-orange-50/20 pointer-events-none" />
                     <CardHeader className="relative pb-6">
                         <div className="flex items-center gap-3 mb-4" />
-                        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
+                        <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white leading-tight">
                             Ranking
                         </CardTitle>
                     </CardHeader>

@@ -101,7 +101,7 @@ export function LoginForm({ className, ...props }) {
                     isMounted ? "scale-100" : "scale-90"
                 )}>
                     <h1 className={cn(
-                        "text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2 transition-all duration-500",
+                        "text-4xl font-bold text-gray-900 dark:text-white leading-tight",
                         "hover:scale-105 cursor-default"
                     )}>
                         Beat Me

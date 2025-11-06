@@ -28,11 +28,23 @@ export default function InstallPWA() {
   if (!visible) return null;
 
   return (
-    <button
-      onClick={handleInstall}
-      className="fixed bottom-6 right-6 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700 transition"
-    >
-      📱 App installieren
-    </button>
+      <button
+          onClick={handleInstall}
+          className="
+      fixed bottom-6 right-6
+      bg-purple-600
+      text-white dark:text-black
+      text-lg md:text-xl
+      px-5 py-3
+      rounded-full shadow-lg
+      hover:bg-purple-700 dark:hover:bg-purple-500
+      transition
+      font-semibold
+    "
+      >
+        📱 Install App
+      </button>
   );
+
+
 }
