@@ -42,7 +42,7 @@ export default function InstallPWA() {
       font-semibold
     "
       >
-        📱 App installieren
+        📱 Install App
       </button>
   );
 
