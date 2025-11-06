@@ -120,7 +120,7 @@ export function Challenge() {
             setFile(null);
         } catch (err) {
             console.error("Upload error:", err);
-            setError(err.message || "An unexpected upload error occurred.");
+            setError(err.message || "An unexpected upload error occurred");
         } finally {
             setLoading(false);
         }
